@@ -180,6 +180,17 @@
         jsonOutput.textContent = JSON.stringify(data, null, 2);
       };
 
+      // Register custom 'hero' block type on mount
+      editorElement.registerBlockType({
+        name: "hero",
+        title: "Hero Banner",
+        icon: "⚡",
+        defaultValue: {
+          title: "Welcome to CMS Title",
+          subtitle: "CMS Subtitle",
+        },
+      });
+
       // Set initial value
       editorElement.value = initialData;
       updateOutput(initialData);
@@ -187,6 +198,99 @@
       // Listen for custom change events
       editorElement.addEventListener("change", (e) => {
         updateOutput(e.detail.value);
+      });
+
+      // Handle the CMS event-bridge mock editing flow
+      editorElement.addEventListener("edit-block", (e) => {
+        const { value, update } = e.detail;
+        const blockType = value._type;
+
+        if (blockType === "image") {
+          const url = prompt(
+            "Enter image URL:",
+            value.url ||
+              "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=60",
+          );
+          const alt = prompt(
+            "Enter alt text:",
+            value.alt || "Abstract gradient",
+          );
+          const caption = prompt(
+            "Enter caption:",
+            value.caption || "Beautiful digital artwork",
+          );
+          if (url !== null) {
+            update({ url, alt, caption });
+          }
+        } else if (blockType === "video") {
+          const url = prompt(
+            "Enter video embed/URL:",
+            value.url || "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          );
+          const caption = prompt(
+            "Enter caption:",
+            value.caption || "Never Gonna Give You Up",
+          );
+          if (url !== null) {
+            update({ url, caption });
+          }
+        } else if (blockType === "codeBlock") {
+          const code = prompt(
+            "Enter code:",
+            value.code ||
+              "const greeting = 'Hello, Edge CMS!';\nconsole.log(greeting);",
+          );
+          const language = prompt(
+            "Enter programming language:",
+            value.language || "javascript",
+          );
+          const filename = prompt(
+            "Enter filename:",
+            value.filename || "main.js",
+          );
+          if (code !== null) {
+            update({ code, language, filename });
+          }
+        } else if (blockType === "hero") {
+          const title = prompt("Enter Hero Title:", value.title || "");
+          const subtitle = prompt("Enter Hero Subtitle:", value.subtitle || "");
+          if (title !== null) {
+            update({ title, subtitle });
+          }
+        } else if (blockType === "table") {
+          // Table data edit demo
+          const cell0 = prompt(
+            "Enter value for row 1, col 1:",
+            value.rows?.[0]?.cells?.[0] || "",
+          );
+          const cell1 = prompt(
+            "Enter value for row 1, col 2:",
+            value.rows?.[0]?.cells?.[1] || "",
+          );
+          if (cell0 !== null && cell1 !== null) {
+            const rows = JSON.parse(JSON.stringify(value.rows || []));
+            if (rows[0]) {
+              rows[0].cells = [cell0, cell1];
+            }
+            update({ rows });
+          }
+        } else {
+          // Generic fallback edit fields loop
+          const keys = Object.keys(value).filter((k) => !k.startsWith("_"));
+          const updated = { ...value };
+          let cancelled = false;
+          for (const k of keys) {
+            const newVal = prompt(`Enter value for field "${k}":`, value[k]);
+            if (newVal === null) {
+              cancelled = true;
+              break;
+            }
+            updated[k] = newVal;
+          }
+          if (!cancelled) {
+            update(updated);
+          }
+        }
       });
     </script>
   </body>

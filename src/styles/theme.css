@@ -188,3 +188,329 @@
 .pe-json-view .key {
   color: #d2a8ff;
 }
+
+/* Dropdown styles */
+.pe-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.pe-dropdown-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pe-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  background: var(--pe-bg-secondary);
+  border: 1px solid var(--pe-border);
+  border-radius: var(--pe-radius);
+  box-shadow: var(--pe-shadow);
+  z-index: 2000;
+  min-width: 160px;
+  overflow: hidden;
+}
+
+.pe-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--pe-text-primary);
+  transition: background var(--pe-transition);
+}
+
+.pe-dropdown-item:hover {
+  background: var(--pe-bg-input);
+}
+
+.pe-dropdown-item-icon {
+  font-size: 14px;
+}
+
+.pe-dropdown-item-title {
+  font-weight: 500;
+}
+
+/* Custom Block Cards */
+.pe-block-card {
+  border: 1px solid var(--pe-border);
+  border-radius: var(--pe-radius);
+  background: var(--pe-bg-secondary);
+  margin: 1.5rem 0;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-family: var(--pe-font-sans);
+}
+
+.pe-block-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--pe-border);
+}
+
+.pe-block-card-title-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pe-block-card-icon {
+  font-size: 16px;
+}
+
+.pe-block-card-name {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--pe-text-secondary);
+}
+
+.pe-block-card-edit-btn {
+  background: var(--pe-bg-input);
+  color: var(--pe-accent);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all var(--pe-transition);
+}
+
+.pe-block-card-edit-btn:hover {
+  background: var(--pe-accent);
+  color: #fff;
+  border-color: var(--pe-accent);
+}
+
+.pe-block-card-body {
+  padding: 14px;
+  background: var(--pe-bg-primary);
+}
+
+/* Block Preview Content */
+.pe-preview-placeholder {
+  font-size: 13px;
+  color: var(--pe-text-secondary);
+  font-style: italic;
+  text-align: center;
+  padding: 12px 0;
+}
+
+.pe-preview-image-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.pe-preview-image {
+  max-width: 100%;
+  max-height: 250px;
+  border-radius: 4px;
+  object-fit: contain;
+  border: 1px solid var(--pe-border);
+}
+
+.pe-preview-caption {
+  font-size: 12px;
+  color: var(--pe-text-secondary);
+  font-style: italic;
+  text-align: center;
+}
+
+.pe-preview-video-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pe-preview-video-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--pe-bg-secondary);
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--pe-border);
+}
+
+.pe-video-play-icon {
+  color: var(--pe-accent);
+  font-size: 14px;
+}
+
+.pe-video-url {
+  font-family: var(--pe-font-mono);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--pe-text-primary);
+}
+
+.pe-preview-table-wrapper {
+  overflow-x: auto;
+}
+
+.pe-preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.pe-preview-table td {
+  border: 1px solid var(--pe-border);
+  padding: 8px 10px;
+  color: var(--pe-text-primary);
+}
+
+.pe-td-empty {
+  color: var(--pe-text-secondary);
+  opacity: 0.5;
+}
+
+.pe-preview-code-wrapper {
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--pe-border);
+}
+
+.pe-code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  background: var(--pe-bg-secondary);
+  border-bottom: 1px solid var(--pe-border);
+  font-size: 11px;
+}
+
+.pe-code-lang {
+  font-weight: 600;
+  color: var(--pe-accent);
+  text-transform: uppercase;
+}
+
+.pe-code-file {
+  color: var(--pe-text-secondary);
+  font-family: var(--pe-font-mono);
+}
+
+.pe-code-body {
+  margin: 0;
+  padding: 12px;
+  background: #0d0d0f;
+  overflow-x: auto;
+}
+
+.pe-code-body code {
+  font-family: var(--pe-font-mono);
+  font-size: 12px;
+  color: var(--pe-text-primary);
+}
+
+.pe-preview-generic-wrapper {
+  font-size: 13px;
+}
+
+.pe-generic-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pe-generic-row {
+  display: flex;
+  gap: 8px;
+}
+
+.pe-generic-key {
+  font-weight: 600;
+  color: var(--pe-text-secondary);
+  min-width: 80px;
+}
+
+.pe-generic-val {
+  color: var(--pe-text-primary);
+}
+
+/* JSON Editor container with line-number gutter */
+.pe-json-editor-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  background: var(--pe-bg-primary);
+  position: relative;
+}
+
+.pe-json-gutter {
+  padding: 1rem 0;
+  width: 50px;
+  background: var(--pe-bg-secondary);
+  border-right: 1px solid var(--pe-border);
+  color: var(--pe-text-secondary);
+  font-family: var(--pe-font-mono);
+  font-size: 13px;
+  text-align: right;
+  user-select: none;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.pe-json-gutter-line {
+  padding-right: 10px;
+  line-height: 1.5;
+  height: 19.5px; /* Matches 13px * 1.5 exact line height */
+}
+
+.pe-json-textarea {
+  flex: 1;
+  margin: 0;
+  padding: 1rem;
+  background: var(--pe-bg-primary);
+  color: var(--pe-text-primary);
+  font-family: var(--pe-font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  border: none;
+  resize: none;
+  outline: none;
+  box-sizing: border-box;
+  overflow: auto;
+  white-space: pre;
+  word-wrap: normal;
+}
+
+.pe-json-error {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--pe-error);
+  color: #fff;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-family: var(--pe-font-sans);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.pe-error-icon {
+  font-size: 14px;
+}

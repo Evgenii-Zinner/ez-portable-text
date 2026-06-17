@@ -1,37 +1,55 @@
 import { html } from "htm/preact";
 import { Component } from "preact";
-import { useState, useEffect } from "preact/hooks";
+import { useState, useEffect, useMemo, useRef } from "preact/hooks";
 import {
   EditorProvider,
   PortableTextEditable,
-  useEditor,
-  usePortableTextEditor,
   defineSchema,
+  useEditor,
 } from "@portabletext/editor";
-import {
-  isActiveDecorator,
-  isActiveStyle,
-} from "@portabletext/editor/selectors";
+import { PRE_BUNDLED_BLOCKS } from "./icons.js";
+import { renderBlock } from "./CustomBlockCard.js";
+import { Toolbar } from "./Toolbar.js";
+import { useEditorSnapshot } from "./hooks.js";
 
-// Default schema if none is provided
-const defaultSchema = defineSchema({
-  decorators: [
-    { name: "strong", title: "Strong" },
-    { name: "em", title: "Emphasis" },
-    { name: "underline", title: "Underline" },
-    { name: "code", title: "Code" },
-  ],
-  styles: [
-    { name: "normal", title: "Normal" },
-    { name: "h1", title: "Heading 1" },
-    { name: "h2", title: "Heading 2" },
-    { name: "blockquote", title: "Quote" },
-  ],
-  annotations: [],
-  lists: [],
-  inlineObjects: [],
-  blockObjects: [],
-});
+/**
+ * Basic JSDoc definitions.
+ */
+
+/**
+ * Compiles dynamic editor schema by merging default schemas and custom blocks.
+ *
+ * @param {Array} [customBlocks=[]] - Consumer-provided custom blocks.
+ * @returns {object} Compiled schema object.
+ */
+export function createEditorSchema(customBlocks = []) {
+  const allBlockObjects = [
+    ...PRE_BUNDLED_BLOCKS.map((b) => ({ name: b.name, title: b.title })),
+    ...customBlocks.map((b) => ({ name: b.name, title: b.title })),
+  ];
+
+  return defineSchema({
+    decorators: [
+      { name: "strong", title: "Strong" },
+      { name: "em", title: "Emphasis" },
+      { name: "underline", title: "Underline" },
+      { name: "code", title: "Code" },
+    ],
+    styles: [
+      { name: "normal", title: "Normal" },
+      { name: "h1", title: "Heading 1" },
+      { name: "h2", title: "Heading 2" },
+      { name: "blockquote", title: "Quote" },
+    ],
+    annotations: [],
+    lists: [
+      { name: "bullet", title: "Bullet" },
+      { name: "number", title: "Number" },
+    ],
+    inlineObjects: [],
+    blockObjects: allBlockObjects,
+  });
+}
 
 // Basic Renderers for styling text inside the Editable
 function renderDecorator(props) {
@@ -56,125 +74,6 @@ function renderStyle(props) {
     </blockquote>`;
 
   return props.children;
-}
-
-// Stateful hook to subscribe to the editor actor's snapshot changes
-function useEditorSnapshot(editor) {
-  const [snapshot, setSnapshot] = useState(() => editor.snapshot);
-
-  useEffect(() => {
-    const subscription = editor.subscribe({
-      next: (nextSnapshot) => {
-        setSnapshot(nextSnapshot);
-      },
-    });
-    return () => subscription.unsubscribe();
-  }, [editor]);
-
-  return snapshot;
-}
-
-function Toolbar() {
-  const editor = useEditor();
-  const pte = usePortableTextEditor();
-  const snapshot = useEditorSnapshot(editor);
-
-  const handleToggleMark = (mark) => (e) => {
-    e.preventDefault();
-    try {
-      if (pte && pte.editable) {
-        pte.editable.toggleMark(mark);
-      } else {
-        editor.send({ type: "decorator.toggle", decorator: mark });
-      }
-    } catch (err) {
-      // Ignored
-    }
-
-    editor.send({ type: "focus" });
-  };
-
-  const handleToggleStyle = (style) => (e) => {
-    e.preventDefault();
-    try {
-      if (pte && pte.editable) {
-        pte.editable.toggleBlockStyle(style);
-      } else {
-        editor.send({ type: "style.toggle", style: style });
-      }
-    } catch (err) {
-      // Ignored
-    }
-
-    editor.send({ type: "focus" });
-  };
-
-  const isMarkActive = (mark) =>
-    snapshot ? isActiveDecorator(mark)(snapshot) : false;
-  const isStyleActive = (style) =>
-    snapshot ? isActiveStyle(style)(snapshot) : false;
-
-  return html`
-    <div class="pe-toolbar-wrapper">
-      <button
-        class="pe-btn ${isMarkActive("strong") ? "pe-btn-active" : ""}"
-        onMouseDown=${handleToggleMark("strong")}
-        onPointerDown=${handleToggleMark("strong")}
-      >
-        B
-      </button>
-      <button
-        class="pe-btn ${isMarkActive("em") ? "pe-btn-active" : ""}"
-        onMouseDown=${handleToggleMark("em")}
-        onPointerDown=${handleToggleMark("em")}
-      >
-        I
-      </button>
-      <button
-        class="pe-btn ${isMarkActive("underline") ? "pe-btn-active" : ""}"
-        onMouseDown=${handleToggleMark("underline")}
-        onPointerDown=${handleToggleMark("underline")}
-      >
-        U
-      </button>
-      <button
-        class="pe-btn ${isMarkActive("code") ? "pe-btn-active" : ""}"
-        onMouseDown=${handleToggleMark("code")}
-        onPointerDown=${handleToggleMark("code")}
-      >
-        &lt;/&gt;
-      </button>
-      <div class="pe-divider"></div>
-      <button
-        class="pe-btn ${isStyleActive("normal") ? "pe-btn-active" : ""}"
-        onMouseDown=${handleToggleStyle("normal")}
-        onPointerDown=${handleToggleStyle("normal")}
-      >
-        P
-      </button>
-      <button
-        class="pe-btn ${isStyleActive("h1") ? "pe-btn-active" : ""}"
-        onMouseDown=${handleToggleStyle("h1")}
-        onPointerDown=${handleToggleStyle("h1")}
-      >
-        H1
-      </button>
-      <button
-        class="pe-btn ${isStyleActive("h2") ? "pe-btn-active" : ""}"
-        onMouseDown=${handleToggleStyle("h2")}
-        onPointerDown=${handleToggleStyle("h2")}
-      >
-        H2
-      </button>
-      <button
-        class="pe-btn ${isStyleActive("blockquote") ? "pe-btn-active" : ""}"
-        onMouseDown=${handleToggleStyle("blockquote")}
-        onPointerDown=${handleToggleStyle("blockquote")}
-      >
-        Quote
-      </button>
-    </div>
-  `;
 }
 
 // A simple JSON syntax highlighter
@@ -206,8 +105,25 @@ function syntaxHighlight(json) {
   });
 }
 
-function EditorListener({ onChange, onSnapshot }) {
+function EditorListener({ onChange, onSnapshot, onEditorInit }) {
+  useEffect(() => {
+    // We get editor reference from DOM element via internal hook,
+    // but Preact handles it inside EditorProvider context.
+  }, []);
+  return null;
+}
+
+// Custom hook or listener component to access Editor context
+function EditorContextBridge({ onChange, onSnapshot, onEditorInit }) {
+  // Can only use hooks inside the EditorProvider
   const editor = useEditor();
+
+  useEffect(() => {
+    if (onEditorInit) {
+      onEditorInit(editor);
+    }
+  }, [editor, onEditorInit]);
+
   useEffect(() => {
     const subscription = editor.subscribe({
       next: (snapshot) => {
@@ -217,6 +133,7 @@ function EditorListener({ onChange, onSnapshot }) {
     });
     return () => subscription.unsubscribe();
   }, [editor, onChange, onSnapshot]);
+
   return null;
 }
 
@@ -226,42 +143,162 @@ function EditorListener({ onChange, onSnapshot }) {
  * @param {object} props - The component props.
  * @param {Array} [props.initialValue] - The initial PortableText JSON value.
  * @param {object} [props.schema] - The schema definition.
+ * @param {Array} [props.customBlocks] - Consumer custom blocks configuration.
  * @param {function} [props.onChange] - Callback fired when document content changes.
+ * @param {function} [props.onEditorInit] - Callback exposing the internal editor actor.
  * @returns {import('htm/preact').Html} The Preact HTML element.
  */
-export function EditorUI({ initialValue, schema, onChange }) {
+export function EditorUI({
+  initialValue,
+  schema,
+  customBlocks = [],
+  onChange,
+  onEditorInit,
+}) {
   const [activeTab, setActiveTab] = useState("visual");
   const [currentValue, setCurrentValue] = useState(initialValue || []);
 
-  const htmlHighlighted = syntaxHighlight(currentValue);
+  const editorRef = useRef(null);
+  const gutterRef = useRef(null);
+  const textareaRef = useRef(null);
+  const [jsonText, setJsonText] = useState(
+    JSON.stringify(currentValue, null, 2),
+  );
+  const [jsonError, setJsonError] = useState(null);
+
+  const lineCount = jsonText.split("\n").length;
+  const lineNumbers = Array.from({ length: lineCount }, (_, i) => i + 1);
+
+  const handleScroll = (e) => {
+    if (gutterRef.current) {
+      gutterRef.current.scrollTop = e.target.scrollTop;
+    }
+  };
+
+  const schemaDefinition = useMemo(() => {
+    if (schema) return schema;
+    return createEditorSchema(customBlocks);
+  }, [schema, customBlocks]);
+
+  // Generate unique key based on block names to force-remount EditorProvider if schema changes
+  const schemaKey = useMemo(() => {
+    const names = schemaDefinition.blockObjects?.map((b) => b.name) || [];
+    return names.join(",");
+  }, [schemaDefinition]);
+
+  // Keep jsonText in sync with visual edits when switching or when value changes
+  useEffect(() => {
+    if (activeTab === "visual") {
+      setJsonText(JSON.stringify(currentValue, null, 2));
+      setJsonError(null);
+    }
+  }, [currentValue, activeTab]);
+
+  const handleEditorInit = (editor) => {
+    editorRef.current = editor;
+    if (onEditorInit) onEditorInit(editor);
+  };
+
+  const handleJsonChange = (e) => {
+    const text = e.target.value;
+    setJsonText(text);
+
+    try {
+      const parsed = JSON.parse(text);
+      if (!Array.isArray(parsed)) {
+        throw new Error("PortableText must be a JSON array of blocks.");
+      }
+      setJsonError(null);
+
+      if (editorRef.current) {
+        editorRef.current.send({ type: "update value", value: parsed });
+      }
+      if (onChange) onChange(parsed);
+    } catch (err) {
+      setJsonError(err.message);
+    }
+  };
 
   return html`
     <div class="pe-editor-container pe-theme-dark">
       <div class="pe-tabs">
-        <div class="pe-tab ${activeTab === "visual" ? "active" : ""}" onClick=${() => setActiveTab("visual")}>Visual Editor</div>
-        <div class="pe-tab ${activeTab === "json" ? "active" : ""}" onClick=${() => setActiveTab("json")}>Clean JSON</div>
+        <div
+          class="pe-tab ${activeTab === "visual" ? "active" : ""}"
+          onClick=${() => setActiveTab("visual")}
+        >
+          Visual Editor
+        </div>
+        <div
+          class="pe-tab ${activeTab === "json" ? "active" : ""}"
+          onClick=${() => setActiveTab("json")}
+        >
+          JSON
+        </div>
       </div>
-      
-      <${EditorProvider} 
+
+      <${EditorProvider}
+        key=${schemaKey}
         initialConfig=${{
           initialValue: initialValue || undefined,
-          schemaDefinition: schema || defaultSchema,
+          schemaDefinition: schemaDefinition,
         }}
       >
-        <${EditorListener} onChange=${onChange} onSnapshot=${setCurrentValue} />
-        
-        <div style=${{ display: activeTab === "visual" ? "flex" : "none", flexDirection: "column", flex: 1, overflow: "hidden" }}>
-          <${Toolbar} />
+        <${EditorContextBridge}
+          onChange=${onChange}
+          onSnapshot=${setCurrentValue}
+          onEditorInit=${handleEditorInit}
+        />
+
+        <div
+          style=${{
+            display: activeTab === "visual" ? "flex" : "none",
+            flexDirection: "column",
+            flex: 1,
+            overflow: "hidden",
+          }}
+        >
+          <${Toolbar} customBlocks=${customBlocks} />
           <div class="pe-visual-canvas">
-            <${PortableTextEditable} 
+            <${PortableTextEditable}
               renderDecorator=${renderDecorator}
               renderStyle=${renderStyle}
+              renderBlock=${renderBlock}
             />
           </div>
         </div>
 
-        <div style=${{ display: activeTab === "json" ? "block" : "none", flex: 1, overflow: "hidden" }}>
-          <pre class="pe-json-view" dangerouslySetInnerHTML=${{ __html: htmlHighlighted }}></pre>
+        <div
+          style=${{
+            display: activeTab === "json" ? "flex" : "none",
+            flexDirection: "column",
+            flex: 1,
+            overflow: "hidden",
+            position: "relative",
+          }}
+        >
+          <div class="pe-json-editor-container">
+            <div class="pe-json-gutter" ref=${gutterRef}>
+              ${lineNumbers.map(
+                (n) => html`<div class="pe-json-gutter-line">${n}</div>`,
+              )}
+            </div>
+            <textarea
+              class="pe-json-textarea"
+              value=${jsonText}
+              onInput=${handleJsonChange}
+              onScroll=${handleScroll}
+              ref=${textareaRef}
+              placeholder="[{...}]"
+            />
+          </div>
+          ${
+            jsonError &&
+            html`
+              <div class="pe-json-error">
+                <span class="pe-error-icon">⚠️</span> ${jsonError}
+              </div>
+            `
+          }
         </div>
       </${EditorProvider}>
     </div>
