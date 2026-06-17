@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ez-portable-text Sandbox</title>
+    <!-- Load UMD Stylesheet (if any) -->
+    <link rel="stylesheet" href="../dist/ez-portable-text.umd.css" />
+
+    <style>
+      :root {
+        --bg-primary: #0a0a0c;
+        --bg-secondary: #121216;
+        --text-primary: #f3f4f6;
+        --text-secondary: #9ca3af;
+        --accent: #10b981;
+        --border: rgba(255, 255, 255, 0.08);
+        --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        font-family: var(--font-sans);
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      header {
+        background-color: var(--bg-secondary);
+        border-bottom: 1px solid var(--border);
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .badge {
+        background-color: rgba(16, 185, 129, 0.1);
+        color: var(--accent);
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 9999px;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+      }
+
+      main {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        overflow: hidden;
+      }
+
+      .editor-section,
+      .json-section {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        padding: 24px;
+        box-sizing: border-box;
+      }
+
+      .editor-section {
+        border-right: 1px solid var(--border);
+      }
+
+      .section-title {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-secondary);
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .editor-wrapper {
+        flex: 1;
+        overflow-y: auto;
+        border-radius: 8px;
+        background: white; /* Editor needs white background usually */
+        color: black;
+        padding: 1rem;
+      }
+
+      #json-output {
+        flex: 1;
+        background-color: var(--bg-secondary);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+        font-family: "JetBrains Mono", "Fira Code", monospace;
+        font-size: 14px;
+        color: #34d399; /* Emerald light green */
+        white-space: pre-wrap;
+        overflow-y: auto;
+        margin: 0;
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>ez-portable-text <span class="badge">Sandbox v4.0</span></h1>
+      <div>
+        <span style="color: var(--text-secondary); font-size: 13px"
+          >Preact Web Component</span
+        >
+      </div>
+    </header>
+
+    <main>
+      <section class="editor-section">
+        <div class="section-title">Visual Editor Canvas</div>
+        <div class="editor-wrapper">
+          <!-- Web Component Mount -->
+          <ez-portable-text id="editor-mount"></ez-portable-text>
+        </div>
+      </section>
+
+      <section class="json-section">
+        <div class="section-title">Live PortableText Output</div>
+        <pre id="json-output">Initializing...</pre>
+      </section>
+    </main>
+
+    <!-- Load UMD Bundle -->
+    <script src="../dist/ez-portable-text.umd.js"></script>
+    <script>
+      // Initial PortableText content
+      const initialData = [
+        {
+          _key: "b1a2",
+          _type: "block",
+          style: "normal",
+          children: [
+            {
+              _key: "s1",
+              _type: "span",
+              marks: [],
+              text: "Welcome to the ez-portable-text sandbox! Try editing this text.",
+            },
+          ],
+          markDefs: [],
+        },
+        {
+          _key: "b3c4",
+          _type: "block",
+          style: "normal",
+          children: [
+            {
+              _key: "s2",
+              _type: "span",
+              marks: [],
+              text: "This editor uses Preact internally but exposes a native Web Component.",
+            },
+          ],
+          markDefs: [],
+        },
+      ];
+
+      const jsonOutput = document.getElementById("json-output");
+      const editorElement = document.getElementById("editor-mount");
+
+      // Helper to print formatted JSON
+      const updateOutput = (data) => {
+        jsonOutput.textContent = JSON.stringify(data, null, 2);
+      };
+
+      // Set initial value
+      editorElement.value = initialData;
+      updateOutput(initialData);
+
+      // Listen for custom change events
+      editorElement.addEventListener("change", (e) => {
+        updateOutput(e.detail.value);
+      });
+    </script>
+  </body>
+</html>

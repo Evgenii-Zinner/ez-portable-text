@@ -1,0 +1,210 @@
+/* default styles for ez-portable-text editor UI elements */
+.ez-portable-text-container {
+  font-family: var(--pe-font-sans, "Inter", system-ui, sans-serif);
+  border: 1px solid var(--pe-border, rgba(255, 255, 255, 0.08));
+  border-radius: var(--pe-radius, 8px);
+  background-color: var(--pe-bg-primary, #121214);
+  color: var(--pe-text-primary, #f3f4f6);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Toolbar Styling */
+.pe-toolbar-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--pe-bg-secondary, #1a1a1e);
+  border-bottom: 1px solid var(--pe-border, rgba(255, 255, 255, 0.08));
+  padding: 8px 12px;
+  gap: 12px;
+  z-index: 1000;
+}
+
+.pe-toolbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pe-style-select {
+  background-color: var(--pe-bg-input, #26262b);
+  color: var(--pe-text-primary, #f3f4f6);
+  border: 1px solid var(--pe-border, rgba(255, 255, 255, 0.08));
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+}
+
+.pe-toolbar-btn {
+  background-color: transparent;
+  color: var(--pe-text-secondary, #9ca3af);
+  border: 1px solid transparent;
+  padding: 4px 8px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
+}
+
+.pe-toolbar-btn:hover {
+  background-color: var(--pe-bg-input, #26262b);
+  color: var(--pe-text-primary, #f3f4f6);
+}
+
+.pe-toolbar-btn.active {
+  background-color: var(--pe-bg-input, #26262b);
+  color: var(--pe-accent, #10b981);
+  border: 1px solid var(--pe-border, rgba(255, 255, 255, 0.08));
+}
+
+.pe-tab-btn {
+  background-color: transparent;
+  color: var(--pe-text-secondary, #9ca3af);
+  border: 1px solid transparent;
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
+}
+
+.pe-tab-btn:hover {
+  color: var(--pe-text-primary, #f3f4f6);
+}
+
+.pe-tab-btn.active {
+  background-color: var(--pe-bg-input, #26262b);
+  color: var(--pe-accent, #10b981);
+  border: 1px solid var(--pe-border, rgba(255, 255, 255, 0.08));
+}
+
+/* Canvas Sheet Area */
+.pe-visual-canvas {
+  min-height: 250px;
+  max-height: 600px;
+  overflow-y: auto;
+  outline: none;
+  font-size: 15px;
+  line-height: 1.6;
+  padding: 16px;
+  z-index: 1;
+}
+
+.pe-visual-canvas p,
+.pe-visual-canvas h1,
+.pe-visual-canvas h2,
+.pe-visual-canvas h3,
+.pe-visual-canvas blockquote {
+  margin: 0 0 12px 0;
+  position: relative;
+}
+
+.pe-visual-canvas h1 {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.pe-visual-canvas h2 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.pe-visual-canvas h3 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.pe-visual-canvas blockquote {
+  border-left: 3px solid var(--pe-accent, #10b981);
+  padding-left: 12px;
+  color: var(--pe-text-secondary, #9ca3af);
+  font-style: italic;
+}
+
+.pe-visual-canvas p:empty::before {
+  content: "Start writing...";
+  color: var(--pe-text-secondary, #9ca3af);
+  pointer-events: none;
+  position: absolute;
+}
+
+/* Raw JSON Area */
+.pe-json-textarea {
+  min-height: 250px;
+  max-height: 600px;
+  background-color: var(--pe-bg-primary, #121214);
+  color: var(--pe-text-secondary, #9ca3af);
+  border: none;
+  outline: none;
+  font-family: var(--pe-font-mono, monospace);
+  font-size: 14px;
+  padding: 16px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+/* Floating Link Popup */
+.pe-link-popup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--pe-bg-secondary, #1a1a1e);
+  border: 1px solid var(--pe-border, rgba(255, 255, 255, 0.08));
+  padding: 8px 12px;
+  border-radius: 6px;
+  box-shadow: var(--pe-shadow, 0 4px 20px -2px rgba(0, 0, 0, 0.5));
+  z-index: 4000;
+}
+
+.pe-link-input {
+  background-color: var(--pe-bg-input, #26262b);
+  color: var(--pe-text-primary, #f3f4f6);
+  border: 1px solid var(--pe-border, rgba(255, 255, 255, 0.08));
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  width: 180px;
+  outline: none;
+}
+
+.pe-link-submit-btn {
+  background-color: var(--pe-accent, #10b981);
+  color: #ffffff;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.pe-link-submit-btn:hover {
+  background-color: var(--pe-accent-hover, #059669);
+}
+
+.pe-link-cancel-btn {
+  background-color: transparent;
+  color: var(--pe-text-secondary, #9ca3af);
+  border: 1px solid var(--pe-border, rgba(255, 255, 255, 0.08));
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.pe-link-cancel-btn:hover {
+  color: var(--pe-text-primary, #f3f4f6);
+}
+
+.pe-visual-canvas a {
+  color: var(--pe-accent, #10b981);
+  text-decoration: underline;
+  cursor: pointer;
+}
