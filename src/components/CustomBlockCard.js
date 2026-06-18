@@ -105,6 +105,22 @@ export function CustomBlockCard({ value, schemaType, path }) {
         "// No code entered"}</code></pre>
       </div>
     `;
+  } else if (typeName === "hero") {
+    previewContent = html`
+      <div
+        class="pe-preview-hero-wrapper"
+        style=${value?.imageUrl
+          ? { backgroundImage: `url(${value.imageUrl})` }
+          : {}}
+      >
+        <div class="pe-preview-hero-overlay">
+          <h3 class="pe-preview-hero-title">${value?.title || "Hero Title"}</h3>
+          <p class="pe-preview-hero-subtitle">
+            ${value?.subtitle || "Hero Subtitle"}
+          </p>
+        </div>
+      </div>
+    `;
   } else {
     const keys = Object.keys(value || {}).filter((k) => !k.startsWith("_"));
     previewContent = html`

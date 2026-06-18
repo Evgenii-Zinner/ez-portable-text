@@ -5,6 +5,44 @@ import { html } from "htm/preact";
  * @type {object}
  */
 export const ICONS = {
+  paragraph: html`<svg
+    width="12"
+    height="12"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M19 4H9.5a4.5 4.5 0 0 0 0 9H13v7M13 4v9" />
+  </svg>`,
+  h1: html`<svg
+    width="12"
+    height="12"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M4 6v12M12 6v12M4 12h8" />
+    <path d="M17 8l2-2v12" />
+  </svg>`,
+  h2: html`<svg
+    width="12"
+    height="12"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M4 6v12M12 6v12M4 12h8" />
+    <path d="M16 8a3 3 0 0 1 5 2c0 2-3 5-5 7h5" />
+  </svg>`,
   bold: html`<svg
     width="12"
     height="12"

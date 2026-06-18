@@ -23,9 +23,78 @@ import { useEditorSnapshot } from "./hooks.js";
  * @returns {object} Compiled schema object.
  */
 export function createEditorSchema(customBlocks = []) {
-  const allBlockObjects = [
-    ...PRE_BUNDLED_BLOCKS.map((b) => ({ name: b.name, title: b.title })),
-    ...customBlocks.map((b) => ({ name: b.name, title: b.title })),
+  const blockObjects = [
+    {
+      name: "image",
+      title: "Image",
+      type: "object",
+      fields: [
+        { name: "url", type: "string" },
+        { name: "alt", type: "string" },
+        { name: "caption", type: "string" },
+      ],
+    },
+    {
+      name: "video",
+      title: "Video",
+      type: "object",
+      fields: [
+        { name: "url", type: "string" },
+        { name: "caption", type: "string" },
+      ],
+    },
+    {
+      name: "table",
+      title: "Table",
+      type: "object",
+      fields: [
+        {
+          name: "rows",
+          type: "array",
+          of: [
+            {
+              name: "tableRow",
+              type: "object",
+              fields: [
+                {
+                  name: "cells",
+                  type: "array",
+                  of: [{ type: "string" }],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: "codeBlock",
+      title: "Code Block",
+      type: "object",
+      fields: [
+        { name: "code", type: "string" },
+        { name: "language", type: "string" },
+        { name: "filename", type: "string" },
+      ],
+    },
+    ...customBlocks.map((b) => {
+      const fields = Object.keys(b.defaultValue || {}).map((key) => {
+        const val = b.defaultValue[key];
+        const type =
+          typeof val === "number"
+            ? "number"
+            : typeof val === "boolean"
+              ? "boolean"
+              : "string";
+        return { name: key, type };
+      });
+      return {
+        name: b.name,
+        title: b.title,
+        type: "object",
+        fields: fields,
+      };
+    }),
   ];
 
   return defineSchema({
@@ -47,7 +116,7 @@ export function createEditorSchema(customBlocks = []) {
       { name: "number", title: "Number" },
     ],
     inlineObjects: [],
-    blockObjects: allBlockObjects,
+    blockObjects: blockObjects,
   });
 }
 
@@ -74,6 +143,21 @@ function renderStyle(props) {
     </blockquote>`;
 
   return props.children;
+}
+
+// List item renderer for visual list display
+function renderListItem(props) {
+  const { value, level, children } = props;
+  const listClass = value === "bullet" ? "pe-list-bullet" : "pe-list-number";
+
+  return html`
+    <div
+      class="pe-list-item ${listClass}"
+      style=${{ "--pe-list-level": level }}
+    >
+      ${children}
+    </div>
+  `;
 }
 
 // A simple JSON syntax highlighter
@@ -127,8 +211,11 @@ function EditorContextBridge({ onChange, onSnapshot, onEditorInit }) {
   useEffect(() => {
     const subscription = editor.subscribe({
       next: (snapshot) => {
-        if (onChange) onChange(snapshot.context.value);
-        if (onSnapshot) onSnapshot(snapshot.context.value);
+        const val = snapshot.context.value;
+        if (val !== undefined) {
+          if (onChange) onChange(val);
+          if (onSnapshot) onSnapshot(val);
+        }
       },
     });
     return () => subscription.unsubscribe();
@@ -263,6 +350,7 @@ export function EditorUI({
               renderDecorator=${renderDecorator}
               renderStyle=${renderStyle}
               renderBlock=${renderBlock}
+              renderListItem=${renderListItem}
             />
           </div>
         </div>

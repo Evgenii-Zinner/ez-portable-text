@@ -20,6 +20,7 @@ export function Toolbar({ customBlocks = [] }) {
   const pte = usePortableTextEditor();
   const snapshot = useEditorSnapshot(editor);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [styleDropdownOpen, setStyleDropdownOpen] = useState(false);
 
   useEffect(() => {
     if (!dropdownOpen) return;
@@ -29,6 +30,15 @@ export function Toolbar({ customBlocks = [] }) {
     document.addEventListener("click", handleDocumentClick);
     return () => document.removeEventListener("click", handleDocumentClick);
   }, [dropdownOpen]);
+
+  useEffect(() => {
+    if (!styleDropdownOpen) return;
+    const handleStyleClick = () => {
+      setStyleDropdownOpen(false);
+    };
+    document.addEventListener("click", handleStyleClick);
+    return () => document.removeEventListener("click", handleStyleClick);
+  }, [styleDropdownOpen]);
 
   const handleToggleMark = (mark) => (e) => {
     e.preventDefault();
@@ -47,6 +57,7 @@ export function Toolbar({ customBlocks = [] }) {
 
   const handleToggleStyle = (style) => (e) => {
     e.preventDefault();
+    setStyleDropdownOpen(false);
     try {
       if (pte && pte.editable) {
         pte.editable.toggleBlockStyle(style);
@@ -78,16 +89,12 @@ export function Toolbar({ customBlocks = [] }) {
 
     try {
       editor.send({
-        type: "behavior event",
-        behaviorEvent: {
-          type: "insert.block",
-          block: {
-            _type: blockConfig.name,
-            ...blockConfig.defaultValue,
-          },
-          placement: "auto",
+        type: "insert.block",
+        block: {
+          _type: blockConfig.name,
+          ...blockConfig.defaultValue,
         },
-        editor,
+        placement: "auto",
       });
     } catch (err) {
       // Ignored
@@ -113,13 +120,70 @@ export function Toolbar({ customBlocks = [] }) {
     return false;
   };
 
+  const getActiveStyleLabel = () => {
+    if (isStyleActive("h1")) return "Heading 1";
+    if (isStyleActive("h2")) return "Heading 2";
+    if (isStyleActive("blockquote")) return "Quote";
+    return "Paragraph";
+  };
+
   const allBlocks = [...PRE_BUNDLED_BLOCKS, ...customBlocks];
 
   return html`
     <div class="pe-toolbar-wrapper">
+      <div class="pe-dropdown-container">
+        <button
+          class="pe-btn pe-dropdown-btn ${styleDropdownOpen ? "active" : ""}"
+          onClick=${(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setStyleDropdownOpen(!styleDropdownOpen);
+          }}
+        >
+          ${getActiveStyleLabel()} ▾
+        </button>
+        ${styleDropdownOpen &&
+        html`
+          <div class="pe-dropdown-menu">
+            <div
+              class="pe-dropdown-item ${isStyleActive("normal")
+                ? "pe-dropdown-item-active"
+                : ""}"
+              onPointerDown=${handleToggleStyle("normal")}
+            >
+              Paragraph
+            </div>
+            <div
+              class="pe-dropdown-item ${isStyleActive("h1")
+                ? "pe-dropdown-item-active"
+                : ""}"
+              onPointerDown=${handleToggleStyle("h1")}
+            >
+              Heading 1
+            </div>
+            <div
+              class="pe-dropdown-item ${isStyleActive("h2")
+                ? "pe-dropdown-item-active"
+                : ""}"
+              onPointerDown=${handleToggleStyle("h2")}
+            >
+              Heading 2
+            </div>
+            <div
+              class="pe-dropdown-item ${isStyleActive("blockquote")
+                ? "pe-dropdown-item-active"
+                : ""}"
+              onPointerDown=${handleToggleStyle("blockquote")}
+            >
+              Quote
+            </div>
+          </div>
+        `}
+      </div>
+      <div class="pe-divider"></div>
+
       <button
         class="pe-btn ${isMarkActive("strong") ? "pe-btn-active" : ""}"
-        onMouseDown=${handleToggleMark("strong")}
         onPointerDown=${handleToggleMark("strong")}
         title="Bold"
       >
@@ -127,7 +191,6 @@ export function Toolbar({ customBlocks = [] }) {
       </button>
       <button
         class="pe-btn ${isMarkActive("em") ? "pe-btn-active" : ""}"
-        onMouseDown=${handleToggleMark("em")}
         onPointerDown=${handleToggleMark("em")}
         title="Italic"
       >
@@ -135,7 +198,6 @@ export function Toolbar({ customBlocks = [] }) {
       </button>
       <button
         class="pe-btn ${isMarkActive("underline") ? "pe-btn-active" : ""}"
-        onMouseDown=${handleToggleMark("underline")}
         onPointerDown=${handleToggleMark("underline")}
         title="Underline"
       >
@@ -143,49 +205,15 @@ export function Toolbar({ customBlocks = [] }) {
       </button>
       <button
         class="pe-btn ${isMarkActive("code") ? "pe-btn-active" : ""}"
-        onMouseDown=${handleToggleMark("code")}
         onPointerDown=${handleToggleMark("code")}
         title="Inline Code"
       >
         ${ICONS.code}
       </button>
       <div class="pe-divider"></div>
-      <button
-        class="pe-btn ${isStyleActive("normal") ? "pe-btn-active" : ""}"
-        onMouseDown=${handleToggleStyle("normal")}
-        onPointerDown=${handleToggleStyle("normal")}
-        title="Paragraph"
-      >
-        P
-      </button>
-      <button
-        class="pe-btn ${isStyleActive("h1") ? "pe-btn-active" : ""}"
-        onMouseDown=${handleToggleStyle("h1")}
-        onPointerDown=${handleToggleStyle("h1")}
-        title="Heading 1"
-      >
-        H1
-      </button>
-      <button
-        class="pe-btn ${isStyleActive("h2") ? "pe-btn-active" : ""}"
-        onMouseDown=${handleToggleStyle("h2")}
-        onPointerDown=${handleToggleStyle("h2")}
-        title="Heading 2"
-      >
-        H2
-      </button>
-      <button
-        class="pe-btn ${isStyleActive("blockquote") ? "pe-btn-active" : ""}"
-        onMouseDown=${handleToggleStyle("blockquote")}
-        onPointerDown=${handleToggleStyle("blockquote")}
-        title="Quote"
-      >
-        ${ICONS.quote}
-      </button>
-      <div class="pe-divider"></div>
+
       <button
         class="pe-btn ${isListActive("bullet") ? "pe-btn-active" : ""}"
-        onMouseDown=${handleToggleList("bullet")}
         onPointerDown=${handleToggleList("bullet")}
         title="Bulleted List"
       >
@@ -193,18 +221,19 @@ export function Toolbar({ customBlocks = [] }) {
       </button>
       <button
         class="pe-btn ${isListActive("number") ? "pe-btn-active" : ""}"
-        onMouseDown=${handleToggleList("number")}
         onPointerDown=${handleToggleList("number")}
         title="Numbered List"
       >
         ${ICONS.numberedList}
       </button>
       <div class="pe-divider"></div>
+
       <div class="pe-dropdown-container">
         <button
           class="pe-btn pe-dropdown-btn ${dropdownOpen ? "active" : ""}"
           onClick=${(e) => {
             e.preventDefault();
+            e.stopPropagation();
             setDropdownOpen(!dropdownOpen);
           }}
         >
@@ -217,7 +246,6 @@ export function Toolbar({ customBlocks = [] }) {
               (block) => html`
                 <div
                   class="pe-dropdown-item"
-                  onMouseDown=${handleInsertBlock(block)}
                   onPointerDown=${handleInsertBlock(block)}
                   key=${block.name}
                 >

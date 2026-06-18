@@ -514,3 +514,80 @@
 .pe-error-icon {
   font-size: 14px;
 }
+
+/* Active style inside dropdowns */
+.pe-dropdown-item-active {
+  background: rgba(16, 185, 129, 0.1) !important;
+  color: var(--pe-accent) !important;
+  font-weight: 600;
+}
+
+/* List Item Styles */
+.pe-list-item {
+  position: relative;
+  padding-left: 1.5rem;
+  margin-left: calc((var(--pe-list-level, 1) - 1) * 1.5rem);
+}
+
+.pe-list-bullet::before {
+  content: "•";
+  position: absolute;
+  left: 0.5rem;
+  color: var(--pe-accent);
+  font-weight: bold;
+}
+
+.pe-list-number::before {
+  counter-increment: pe-list-counter;
+  content: counter(pe-list-counter) ".";
+  position: absolute;
+  left: 0.2rem;
+  color: var(--pe-accent);
+  font-weight: bold;
+}
+
+/* Reset number counters on non-list block elements */
+.pe-visual-canvas [data-portabletext-block]:not(:has(.pe-list-item)) {
+  counter-reset: pe-list-counter;
+}
+
+/* Hero Banner preview card */
+.pe-preview-hero-wrapper {
+  position: relative;
+  min-height: 180px;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--pe-bg-primary);
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.pe-preview-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.pe-preview-hero-title {
+  margin: 0 0 8px 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  font-family: var(--pe-font-sans);
+}
+
+.pe-preview-hero-subtitle {
+  margin: 0;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: var(--pe-font-sans);
+}

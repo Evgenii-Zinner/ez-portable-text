@@ -14,6 +14,7 @@ export class EzPortableTextWebComponent extends HTMLElement {
     this._customBlocks = [];
     this._isMounted = false;
     this._editorRef = null;
+    this._hasLoadedValue = false;
   }
 
   /**
@@ -31,7 +32,7 @@ export class EzPortableTextWebComponent extends HTMLElement {
    * @param {Array} newValue - List of custom block configurations.
    */
   set customBlocks(newValue) {
-    this._customBlocks = Array.isArray(newValue) ? newValue : [];
+    this._customBlocks = Array.isArray(newValue) ? [...newValue] : [];
     if (this._isMounted) {
       this._render();
     }
@@ -53,12 +54,15 @@ export class EzPortableTextWebComponent extends HTMLElement {
     }
     const exists = this._customBlocks.some((b) => b.name === config.name);
     if (!exists) {
-      this._customBlocks.push({
-        name: config.name,
-        title: config.title || config.name,
-        icon: config.icon || "🧩",
-        defaultValue: config.defaultValue || {},
-      });
+      this._customBlocks = [
+        ...this._customBlocks,
+        {
+          name: config.name,
+          title: config.title || config.name,
+          icon: config.icon || "🧩",
+          defaultValue: config.defaultValue || {},
+        },
+      ];
       if (this._isMounted) {
         this._render();
       }
@@ -72,6 +76,7 @@ export class EzPortableTextWebComponent extends HTMLElement {
    */
   connectedCallback() {
     this._isMounted = true;
+    this._hasLoadedValue = false;
 
     // Parse initial value from text content or attribute
     if (!this._value) {
@@ -130,6 +135,7 @@ export class EzPortableTextWebComponent extends HTMLElement {
     this._value = newValue;
     if (this._editorRef) {
       this._editorRef.send({ type: "update value", value: newValue });
+      this._hasLoadedValue = true;
     } else if (this._isMounted) {
       this._render();
     }
@@ -179,16 +185,12 @@ export class EzPortableTextWebComponent extends HTMLElement {
     if (this._editorRef) {
       const typeName = typeof type === "string" ? type : type.name;
       this._editorRef.send({
-        type: "behavior event",
-        behaviorEvent: {
-          type: "insert.block",
-          block: {
-            _type: typeName,
-            ...value,
-          },
-          placement: "auto",
+        type: "insert.block",
+        block: {
+          _type: typeName,
+          ...value,
         },
-        editor: this._editorRef,
+        placement: "auto",
       });
       this._editorRef.send({ type: "focus" });
     }
@@ -239,6 +241,21 @@ export class EzPortableTextWebComponent extends HTMLElement {
    * @returns {void}
    */
   _handleChange = (newValue) => {
+    // Avoid overwriting populated initial value with transient empty states during initialization
+    if (
+      Array.isArray(newValue) &&
+      newValue.length === 0 &&
+      this._value &&
+      this._value.length > 0 &&
+      !this._hasLoadedValue
+    ) {
+      return;
+    }
+
+    if (Array.isArray(newValue) && newValue.length > 0) {
+      this._hasLoadedValue = true;
+    }
+
     this._value = newValue;
 
     this.dispatchEvent(
@@ -264,6 +281,9 @@ export class EzPortableTextWebComponent extends HTMLElement {
         customBlocks=${this._customBlocks}
         onEditorInit=${(editor) => {
           this._editorRef = editor;
+          if (this._value && this._value.length > 0) {
+            editor.send({ type: "update value", value: this._value });
+          }
         }}
       />`,
       this,
