@@ -1,5 +1,10 @@
 # ez-portable-text
 
+[![License](https://img.shields.io/github/license/Evgenii-Zinner/ez-portable-text?style=flat-square&color=10b981)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/Evgenii-Zinner/ez-portable-text?style=flat-square&color=10b981)](https://github.com/Evgenii-Zinner/ez-portable-text/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/Evgenii-Zinner/ez-portable-text?style=flat-square&color=10b981)](https://github.com/Evgenii-Zinner/ez-portable-text/issues)
+[![GitHub PRs](https://img.shields.io/github/issues-pr/Evgenii-Zinner/ez-portable-text?style=flat-square&color=10b981)](https://github.com/Evgenii-Zinner/ez-portable-text/pulls)
+
 A lightweight, zero-dependency (from the consumer's perspective) vanilla JavaScript rich-text editor wrapper around Sanity's `@portabletext/editor` (v7.x). It natively reads and writes PortableText JSON, compiles to highly optimized ESM and UMD bundles, and exposes a native custom Web Component (`<ez-portable-text>`).
 
 ---
