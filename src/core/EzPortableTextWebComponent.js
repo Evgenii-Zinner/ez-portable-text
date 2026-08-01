@@ -78,10 +78,11 @@ export class EzPortableTextWebComponent extends HTMLElement {
     this._isMounted = true;
     this._hasLoadedValue = false;
 
-    // Parse initial value from text content or attribute
+    // Parse initial value from attribute or text content
     if (!this._value) {
       try {
-        const rawContent = this.textContent.trim();
+        const attrContent = this.getAttribute("data-initial-value");
+        const rawContent = (attrContent || this.textContent || "").trim();
         if (rawContent) {
           this._value = JSON.parse(rawContent);
         }
@@ -90,6 +91,18 @@ export class EzPortableTextWebComponent extends HTMLElement {
           "EzPortableText: Failed to parse initial JSON content",
           e,
         );
+      }
+    }
+
+    // Parse custom schemas synchronously
+    if (this._customBlocks.length === 0) {
+      try {
+        const attrBlocks = this.getAttribute("data-custom-blocks");
+        if (attrBlocks) {
+          this._customBlocks = JSON.parse(attrBlocks);
+        }
+      } catch (e) {
+        console.error("EzPortableText: Failed to parse custom blocks", e);
       }
     }
 
@@ -281,9 +294,6 @@ export class EzPortableTextWebComponent extends HTMLElement {
         customBlocks=${this._customBlocks}
         onEditorInit=${(editor) => {
           this._editorRef = editor;
-          if (this._value && this._value.length > 0) {
-            editor.send({ type: "update value", value: this._value });
-          }
         }}
       />`,
       this,
