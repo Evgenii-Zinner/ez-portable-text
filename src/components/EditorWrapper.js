@@ -110,7 +110,14 @@ export function createEditorSchema(customBlocks = []) {
       { name: "h2", title: "Heading 2" },
       { name: "blockquote", title: "Quote" },
     ],
-    annotations: [],
+    annotations: [
+      {
+        name: "link",
+        title: "Link",
+        type: "object",
+        fields: [{ name: "href", title: "URL", type: "string" }],
+      },
+    ],
     lists: [
       { name: "bullet", title: "Bullet" },
       { name: "number", title: "Number" },
@@ -128,6 +135,14 @@ function renderDecorator(props) {
   if (props.value === "code")
     return html`<code class="pe-code-span">${props.children}</code>`;
 
+  return props.children;
+}
+
+// Annotation renderer for links
+function renderAnnotation(props) {
+  if (props.value._type === "link") {
+    return html`<a href=${props.value.href} class="pe-editor-link" onClick=${(e) => e.preventDefault()} style="color: var(--theme-link-text, #3b82f6); text-decoration: underline;">${props.children}</a>`;
+  }
   return props.children;
 }
 
@@ -351,6 +366,7 @@ export function EditorUI({
               renderStyle=${renderStyle}
               renderBlock=${renderBlock}
               renderListItem=${renderListItem}
+              renderAnnotation=${renderAnnotation}
             />
           </div>
         </div>

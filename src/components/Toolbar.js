@@ -4,6 +4,7 @@ import { useEditor, usePortableTextEditor } from "@portabletext/editor";
 import {
   isActiveDecorator,
   isActiveStyle,
+  isActiveAnnotation,
 } from "@portabletext/editor/selectors";
 import { ICONS, PRE_BUNDLED_BLOCKS } from "./icons.js";
 import { useEditorSnapshot } from "./hooks.js";
@@ -107,6 +108,30 @@ export function Toolbar({ customBlocks = [] }) {
     snapshot ? isActiveDecorator(mark)(snapshot) : false;
   const isStyleActive = (style) =>
     snapshot ? isActiveStyle(style)(snapshot) : false;
+  const isLinkActive = snapshot ? isActiveAnnotation("link")(snapshot) : false;
+
+  const handleToggleLink = (e) => {
+    e.preventDefault();
+    try {
+      if (isLinkActive) {
+        editor.send({
+          type: "annotation.remove",
+          annotation: { name: "link" },
+        });
+      } else {
+        const url = window.prompt("Enter link URL:", "https://");
+        if (url) {
+          editor.send({
+            type: "annotation.add",
+            annotation: { name: "link", value: { href: url } },
+          });
+        }
+      }
+    } catch (err) {
+      // Ignored
+    }
+    editor.send({ type: "focus" });
+  };
 
   const isListActive = (listStyle) => {
     if (!snapshot) return false;
@@ -209,6 +234,13 @@ export function Toolbar({ customBlocks = [] }) {
         title="Inline Code"
       >
         ${ICONS.code}
+      </button>
+      <button
+        class="pe-btn ${isLinkActive ? "pe-btn-active" : ""}"
+        onPointerDown=${handleToggleLink}
+        title="Link"
+      >
+        ${ICONS.link}
       </button>
       <div class="pe-divider"></div>
 
