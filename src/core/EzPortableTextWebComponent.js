@@ -1,6 +1,40 @@
 import { html, render } from "htm/preact";
 import { EditorWrapper } from "../components/EditorWrapper.js";
 
+const generateId = () => Math.random().toString(36).substring(2, 12);
+
+const injectKeys = (blocks) => {
+  if (!Array.isArray(blocks)) return blocks;
+  return blocks.map(block => {
+    const newBlock = { ...block };
+    if (!newBlock._key) newBlock._key = generateId();
+    if (Array.isArray(newBlock.children)) {
+      newBlock.children = newBlock.children.map(child => {
+        const newChild = { ...child };
+        if (!newChild._key) newChild._key = generateId();
+        return newChild;
+      });
+    }
+    return newBlock;
+  });
+};
+
+const stripKeys = (blocks) => {
+  if (!Array.isArray(blocks)) return blocks;
+  return blocks.map(block => {
+    const newBlock = { ...block };
+    delete newBlock._key;
+    if (Array.isArray(newBlock.children)) {
+      newBlock.children = newBlock.children.map(child => {
+        const newChild = { ...child };
+        delete newChild._key;
+        return newChild;
+      });
+    }
+    return newBlock;
+  });
+};
+
 /**
  * EzPortableTextWebComponent is a custom HTML element wrapper for Portable Text.
  * It integrates the EditorWrapper component with Preact and dispatches 'change' events.
@@ -84,7 +118,7 @@ export class EzPortableTextWebComponent extends HTMLElement {
         const attrContent = this.getAttribute("data-initial-value");
         const rawContent = (attrContent || this.textContent || "").trim();
         if (rawContent) {
-          this._value = JSON.parse(rawContent);
+          this._value = injectKeys(JSON.parse(rawContent));
         }
       } catch (e) {
         console.error(
@@ -270,10 +304,11 @@ export class EzPortableTextWebComponent extends HTMLElement {
     }
 
     this._value = newValue;
+    const strippedValue = stripKeys(newValue);
 
     this.dispatchEvent(
       new CustomEvent("change", {
-        detail: { value: newValue },
+        detail: { value: strippedValue },
         bubbles: true,
         composed: true,
       }),
