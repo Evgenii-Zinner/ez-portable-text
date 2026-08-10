@@ -35,7 +35,7 @@
   width: 100%;
   border: 1px solid var(--pe-border);
   border-radius: var(--pe-radius);
-  overflow: hidden;
+  overflow: visible;
   background: var(--pe-bg-primary);
   color: var(--pe-text-primary);
   font-family: var(--pe-font-sans);
@@ -52,7 +52,7 @@
   background: var(--pe-bg-secondary);
   border-bottom: 1px solid var(--pe-border);
   position: sticky;
-  top: 0;
+  top: -1rem;
 }
 
 /* Visual Canvas Layout */
@@ -60,7 +60,7 @@
   z-index: 1;
   flex: 1;
   padding: 1rem 1.5rem;
-  overflow-y: auto;
+  overflow-y: visible;
   outline: none;
   font-size: 16px;
   line-height: 1.6;
@@ -144,6 +144,9 @@
   display: flex;
   background: var(--pe-bg-secondary);
   border-bottom: 1px solid var(--pe-border);
+  position: sticky;
+  top: -3rem;
+  z-index: 1001;
 }
 .pe-tab {
   padding: 8px 16px;

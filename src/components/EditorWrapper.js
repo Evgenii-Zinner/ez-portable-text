@@ -356,7 +356,6 @@ export function EditorUI({
             display: activeTab === "visual" ? "flex" : "none",
             flexDirection: "column",
             flex: 1,
-            overflow: "hidden",
           }}
         >
           <${Toolbar} customBlocks=${customBlocks} />
