@@ -2,7 +2,7 @@ import { html } from "htm/preact";
 import { ICONS } from "../components/icons.js";
 
 /**
- * Common card container wrapper for custom PortableText blocks.
+ * Common card container wrapper for PortableText blocks with action toolbar.
  *
  * @param {object} props
  * @param {string} props.typeName - Block type identifier.
@@ -13,11 +13,11 @@ import { ICONS } from "../components/icons.js";
  * @param {import('htm/preact').Html} props.children - Custom block preview body.
  */
 export function BlockCardWrapper({ typeName, title, icon, value, path, children }) {
-  const handleEditClick = (e) => {
+  const dispatchAction = (eventName, e) => {
     e.preventDefault();
     e.stopPropagation();
 
-    const event = new CustomEvent("pe-edit-block", {
+    const event = new CustomEvent(eventName, {
       detail: { value, path },
       bubbles: true,
       composed: true,
@@ -35,8 +35,45 @@ export function BlockCardWrapper({ typeName, title, icon, value, path, children 
           <span class="pe-block-card-name">${title}</span>
         </div>
         <div class="pe-block-card-actions">
-          <button class="pe-block-card-edit-btn" onClick=${handleEditClick}>
-            Edit Block
+          <button
+            type="button"
+            class="pe-block-action-btn pe-action-up"
+            title="Move Up"
+            onClick=${(e) => dispatchAction("pe-move-block-up", e)}
+          >
+            ↑
+          </button>
+          <button
+            type="button"
+            class="pe-block-action-btn pe-action-down"
+            title="Move Down"
+            onClick=${(e) => dispatchAction("pe-move-block-down", e)}
+          >
+            ↓
+          </button>
+          <button
+            type="button"
+            class="pe-block-action-btn pe-action-duplicate"
+            title="Duplicate Block"
+            onClick=${(e) => dispatchAction("pe-duplicate-block", e)}
+          >
+            📋
+          </button>
+          <button
+            type="button"
+            class="pe-block-action-btn pe-action-delete"
+            title="Delete Block"
+            onClick=${(e) => dispatchAction("pe-delete-block", e)}
+          >
+            🗑
+          </button>
+          <button
+            type="button"
+            class="pe-block-card-edit-btn"
+            title="Edit Options"
+            onClick=${(e) => dispatchAction("pe-edit-block", e)}
+          >
+            Edit
           </button>
         </div>
       </div>

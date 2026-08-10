@@ -279,11 +279,55 @@
   color: var(--pe-text-secondary);
 }
 
+.pe-block-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pe-block-action-btn {
+  background: var(--pe-bg-input);
+  color: var(--pe-text-secondary);
+  border: 1px solid var(--pe-border);
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all var(--pe-transition);
+}
+
+.pe-block-action-btn:hover {
+  background: var(--pe-border);
+  color: var(--pe-text-primary);
+}
+
+.pe-action-up:hover,
+.pe-action-down:hover {
+  border-color: var(--pe-accent);
+  color: var(--pe-accent);
+}
+
+.pe-action-duplicate:hover {
+  border-color: #3b82f6;
+  color: #60a5fa;
+}
+
+.pe-action-delete:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: var(--pe-error);
+  color: #fca5a5;
+}
+
 .pe-block-card-edit-btn {
   background: var(--pe-bg-input);
   color: var(--pe-accent);
   border: 1px solid rgba(16, 185, 129, 0.2);
   padding: 4px 10px;
+  height: 28px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 12px;

@@ -321,8 +321,92 @@ export function EditorUI({
     }
   };
 
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const handleMoveUp = (e) => {
+      const targetValue = e.detail?.value;
+      if (!Array.isArray(currentValue) || !targetValue?._key) return;
+      const index = currentValue.findIndex((b) => b._key === targetValue._key);
+      if (index <= 0) return;
+
+      const next = [...currentValue];
+      const temp = next[index - 1];
+      next[index - 1] = next[index];
+      next[index] = temp;
+
+      if (editorRef.current) {
+        editorRef.current.send({ type: "update value", value: next });
+      }
+      if (onChange) onChange(next);
+    };
+
+    const handleMoveDown = (e) => {
+      const targetValue = e.detail?.value;
+      if (!Array.isArray(currentValue) || !targetValue?._key) return;
+      const index = currentValue.findIndex((b) => b._key === targetValue._key);
+      if (index < 0 || index >= currentValue.length - 1) return;
+
+      const next = [...currentValue];
+      const temp = next[index + 1];
+      next[index + 1] = next[index];
+      next[index] = temp;
+
+      if (editorRef.current) {
+        editorRef.current.send({ type: "update value", value: next });
+      }
+      if (onChange) onChange(next);
+    };
+
+    const handleDuplicate = (e) => {
+      const targetValue = e.detail?.value;
+      if (!Array.isArray(currentValue) || !targetValue?._key) return;
+      const index = currentValue.findIndex((b) => b._key === targetValue._key);
+      if (index < 0) return;
+
+      const newKey = "b_" + Math.random().toString(36).substring(2, 11);
+      const cloned = JSON.parse(JSON.stringify(targetValue));
+      cloned._key = newKey;
+
+      const next = [...currentValue];
+      next.splice(index + 1, 0, cloned);
+
+      if (editorRef.current) {
+        editorRef.current.send({ type: "update value", value: next });
+      }
+      if (onChange) onChange(next);
+    };
+
+    const handleDelete = (e) => {
+      const targetValue = e.detail?.value;
+      if (!Array.isArray(currentValue) || !targetValue?._key) return;
+
+      const next = currentValue.filter((b) => b._key !== targetValue._key);
+
+      if (editorRef.current) {
+        editorRef.current.send({ type: "update value", value: next });
+      }
+      if (onChange) onChange(next);
+    };
+
+    el.addEventListener("pe-move-block-up", handleMoveUp);
+    el.addEventListener("pe-move-block-down", handleMoveDown);
+    el.addEventListener("pe-duplicate-block", handleDuplicate);
+    el.addEventListener("pe-delete-block", handleDelete);
+
+    return () => {
+      el.removeEventListener("pe-move-block-up", handleMoveUp);
+      el.removeEventListener("pe-move-block-down", handleMoveDown);
+      el.removeEventListener("pe-duplicate-block", handleDuplicate);
+      el.removeEventListener("pe-delete-block", handleDelete);
+    };
+  }, [currentValue, onChange]);
+
   return html`
-    <div class="pe-editor-container pe-theme-dark">
+    <div ref=${containerRef} class="pe-editor-container pe-theme-dark">
       <div class="pe-tabs">
         <div
           class="pe-tab ${activeTab === "visual" ? "active" : ""}"
