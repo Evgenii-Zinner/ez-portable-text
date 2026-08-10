@@ -409,11 +409,62 @@ export function EditorUI({
       if (onChange) onChange(next);
     };
 
+    const handleKeyDown = (e) => {
+      const card = e.target.closest?.(".pe-block-card");
+      if (!card) return;
+
+      const isInput = ["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName);
+
+      if (e.key === "Enter" && !e.shiftKey && isInput) {
+        return; // Normal typing inside input
+      }
+
+      if (e.key === "Enter" && !isInput) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const blockType = card.getAttribute("data-block-type");
+        const allCards = Array.from(el.querySelectorAll(".pe-block-card"));
+        const cardIndex = allCards.indexOf(card);
+
+        const newParagraphKey = "b_" + Math.random().toString(36).substring(2, 11);
+        const newParagraph = {
+          _type: "block",
+          _key: newParagraphKey,
+          style: "normal",
+          children: [{ _type: "span", text: "" }],
+        };
+
+        const next = [...currentValue];
+        next.splice(cardIndex + 1, 0, newParagraph);
+
+        if (editorRef.current) {
+          editorRef.current.send({ type: "update value", value: next });
+        }
+        if (onChange) onChange(next);
+      } else if ((e.key === "Delete" || e.key === "Backspace") && !isInput) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const allCards = Array.from(el.querySelectorAll(".pe-block-card"));
+        const cardIndex = allCards.indexOf(card);
+        if (cardIndex < 0) return;
+
+        const next = currentValue.filter((_, idx) => idx !== cardIndex);
+
+        if (editorRef.current) {
+          editorRef.current.send({ type: "update value", value: next });
+        }
+        if (onChange) onChange(next);
+      }
+    };
+
     el.addEventListener("pe-move-block-up", handleMoveUp);
     el.addEventListener("pe-move-block-down", handleMoveDown);
     el.addEventListener("pe-duplicate-block", handleDuplicate);
     el.addEventListener("pe-delete-block", handleDelete);
     el.addEventListener("pe-update-block-data", handleUpdateData);
+    el.addEventListener("keydown", handleKeyDown);
 
     return () => {
       el.removeEventListener("pe-move-block-up", handleMoveUp);
@@ -421,6 +472,7 @@ export function EditorUI({
       el.removeEventListener("pe-duplicate-block", handleDuplicate);
       el.removeEventListener("pe-delete-block", handleDelete);
       el.removeEventListener("pe-update-block-data", handleUpdateData);
+      el.removeEventListener("keydown", handleKeyDown);
     };
   }, [currentValue, onChange]);
 

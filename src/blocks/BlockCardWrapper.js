@@ -28,7 +28,7 @@ export function BlockCardWrapper({ typeName, title, icon, value, path, children 
   const blockIcon = icon || ICONS[typeName] || ICONS.puzzle;
 
   return html`
-    <div class="pe-block-card" data-block-type=${typeName}>
+    <div class="pe-block-card" data-block-type=${typeName} tabIndex="0">
       <div class="pe-block-card-header">
         <div class="pe-block-card-title-area">
           <span class="pe-block-card-icon">${blockIcon}</span>
