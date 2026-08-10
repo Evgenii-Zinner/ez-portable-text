@@ -8,7 +8,7 @@ import {
   useEditor,
 } from "@portabletext/editor";
 import { PRE_BUNDLED_BLOCKS } from "./icons.js";
-import { renderBlock } from "./CustomBlockCard.js";
+import { renderBlock } from "../blocks/index.js";
 import { Toolbar } from "./Toolbar.js";
 import { useEditorSnapshot } from "./hooks.js";
 
