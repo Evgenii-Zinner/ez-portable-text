@@ -392,16 +392,35 @@ export function EditorUI({
       if (onChange) onChange(next);
     };
 
+    const handleUpdateData = (e) => {
+      const { value: targetValue, patch } = e.detail || {};
+      if (!Array.isArray(currentValue) || !targetValue?._key || !patch) return;
+
+      const next = currentValue.map((b) => {
+        if (b._key === targetValue._key) {
+          return { ...b, ...patch };
+        }
+        return b;
+      });
+
+      if (editorRef.current) {
+        editorRef.current.send({ type: "update value", value: next });
+      }
+      if (onChange) onChange(next);
+    };
+
     el.addEventListener("pe-move-block-up", handleMoveUp);
     el.addEventListener("pe-move-block-down", handleMoveDown);
     el.addEventListener("pe-duplicate-block", handleDuplicate);
     el.addEventListener("pe-delete-block", handleDelete);
+    el.addEventListener("pe-update-block-data", handleUpdateData);
 
     return () => {
       el.removeEventListener("pe-move-block-up", handleMoveUp);
       el.removeEventListener("pe-move-block-down", handleMoveDown);
       el.removeEventListener("pe-duplicate-block", handleDuplicate);
       el.removeEventListener("pe-delete-block", handleDelete);
+      el.removeEventListener("pe-update-block-data", handleUpdateData);
     };
   }, [currentValue, onChange]);
 
