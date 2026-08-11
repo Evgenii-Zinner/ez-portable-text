@@ -246,7 +246,7 @@ export function BentoGridBlock({ value, schemaType, path }) {
       </div>
 
       <div class="pe-bento-footer">
-        <button type="button" class="pe-btn pe-btn-active" onClick=${handleAddCard}>
+        <button type="button" class="pe-btn" onClick=${handleAddCard}>
           <span class="pe-btn-icon">${ICONS.plus}</span>
           <span>Add Bento Card</span>
         </button>
