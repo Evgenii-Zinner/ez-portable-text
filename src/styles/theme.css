@@ -1488,3 +1488,113 @@
   display: flex;
   justify-content: flex-end;
 }
+
+.pe-table-editor-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pe-table-col-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.pe-table-corner-space {
+  width: 32px;
+  flex-shrink: 0;
+}
+
+.pe-table-col-controls {
+  display: flex;
+  flex: 1;
+  gap: 4px;
+}
+
+.pe-table-col-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.pe-table-row-handle-td {
+  width: 28px;
+  padding: 2px !important;
+  text-align: center;
+  vertical-align: middle;
+  background: transparent !important;
+  border: none !important;
+}
+
+.pe-table-row-handle-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.pe-table-edge-btn {
+  background: var(--pe-bg-input);
+  border: 1px solid var(--pe-border);
+  color: var(--pe-text-muted);
+  border-radius: 4px;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, visibility 0.15s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.pe-table-edge-btn svg {
+  width: 11px;
+  height: 11px;
+}
+
+/* Reveal buttons when hovering over specific column, row, or bottom edge */
+.pe-table-col-item:hover .pe-table-edge-btn,
+.pe-table-col-controls:hover .pe-table-add-col-end,
+tr:hover .pe-table-row-handle-td .pe-table-edge-btn,
+.pe-table-bottom-add-row:hover .pe-table-edge-btn,
+.pe-table-editor-container:hover .pe-table-bottom-add-row .pe-table-edge-btn {
+  opacity: 0.7;
+  visibility: visible;
+}
+
+.pe-table-edge-btn:hover {
+  opacity: 1 !important;
+  visibility: visible !important;
+  background: rgba(16, 185, 129, 0.15);
+  border-color: var(--pe-accent);
+  color: var(--pe-accent);
+}
+
+.pe-table-del-col-btn:hover,
+.pe-table-del-row-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.pe-table-bottom-add-row {
+  display: flex;
+  padding-left: 32px;
+  margin-top: 4px;
+}
+
+.pe-table-header-row {
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.pe-cell-header-input {
+  font-weight: 700;
+  color: var(--pe-accent);
+}

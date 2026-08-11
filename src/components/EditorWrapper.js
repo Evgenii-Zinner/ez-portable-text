@@ -48,6 +48,7 @@ export function createEditorSchema(customBlocks = []) {
       title: "Table",
       type: "object",
       fields: [
+        { name: "withHeadings", type: "boolean" },
         {
           name: "rows",
           type: "array",
