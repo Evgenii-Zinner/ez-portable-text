@@ -6,6 +6,8 @@ import { HeroBlock } from "./HeroBlock.js";
 import { TableBlock } from "./TableBlock.js";
 import { VideoBlock } from "./VideoBlock.js";
 import { EmbedBlock } from "./EmbedBlock.js";
+import { CardBlock } from "./CardBlock.js";
+import { BentoGridBlock } from "./BentoGridBlock.js";
 import { FallbackBlock } from "./FallbackBlock.js";
 
 // Register core block renderers
@@ -16,6 +18,8 @@ BlockRegistry.register("hero", HeroBlock);
 BlockRegistry.register("table", TableBlock);
 BlockRegistry.register("video", VideoBlock);
 BlockRegistry.register("embed", EmbedBlock);
+BlockRegistry.register("card", CardBlock);
+BlockRegistry.register("bentoGrid", BentoGridBlock);
 
 export {
   BlockRegistry,
@@ -26,6 +30,8 @@ export {
   TableBlock,
   VideoBlock,
   EmbedBlock,
+  CardBlock,
+  BentoGridBlock,
   FallbackBlock,
 };
 

@@ -9,8 +9,10 @@ import {
 import { ICONS, PRE_BUNDLED_BLOCKS } from "./icons.js";
 import { useEditorSnapshot } from "./hooks.js";
 
+import { LinkModal } from "./LinkModal.js";
+
 /**
- * Editor Toolbar Component containing text, layout, and block controls.
+ * Editor Toolbar Component with direct 1-click block insertion buttons and styled link modal.
  *
  * @param {object} props - Component properties.
  * @param {Array} [props.customBlocks=[]] - Custom block registrations.
@@ -20,26 +22,7 @@ export function Toolbar({ customBlocks = [] }) {
   const editor = useEditor();
   const pte = usePortableTextEditor();
   const snapshot = useEditorSnapshot(editor);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [styleDropdownOpen, setStyleDropdownOpen] = useState(false);
-
-  useEffect(() => {
-    if (!dropdownOpen) return;
-    const handleDocumentClick = () => {
-      setDropdownOpen(false);
-    };
-    document.addEventListener("click", handleDocumentClick);
-    return () => document.removeEventListener("click", handleDocumentClick);
-  }, [dropdownOpen]);
-
-  useEffect(() => {
-    if (!styleDropdownOpen) return;
-    const handleStyleClick = () => {
-      setStyleDropdownOpen(false);
-    };
-    document.addEventListener("click", handleStyleClick);
-    return () => document.removeEventListener("click", handleStyleClick);
-  }, [styleDropdownOpen]);
+  const [showLinkModal, setShowLinkModal] = useState(false);
 
   const handleToggleMark = (mark) => (e) => {
     e.preventDefault();
@@ -52,13 +35,11 @@ export function Toolbar({ customBlocks = [] }) {
     } catch (err) {
       // Ignored
     }
-
     editor.send({ type: "focus" });
   };
 
   const handleToggleStyle = (style) => (e) => {
     e.preventDefault();
-    setStyleDropdownOpen(false);
     try {
       if (pte && pte.editable) {
         pte.editable.toggleBlockStyle(style);
@@ -68,7 +49,6 @@ export function Toolbar({ customBlocks = [] }) {
     } catch (err) {
       // Ignored
     }
-
     editor.send({ type: "focus" });
   };
 
@@ -86,7 +66,6 @@ export function Toolbar({ customBlocks = [] }) {
 
   const handleInsertBlock = (blockConfig) => (e) => {
     e.preventDefault();
-    setDropdownOpen(false);
 
     try {
       editor.send({
@@ -110,23 +89,31 @@ export function Toolbar({ customBlocks = [] }) {
     snapshot ? isActiveStyle(style)(snapshot) : false;
   const isLinkActive = snapshot ? isActiveAnnotation("link")(snapshot) : false;
 
-  const handleToggleLink = (e) => {
+  const handleOpenLinkModal = (e) => {
     e.preventDefault();
+    setShowLinkModal(true);
+  };
+
+  const handleSaveLink = (url) => {
+    setShowLinkModal(false);
     try {
-      if (isLinkActive) {
-        editor.send({
-          type: "annotation.remove",
-          annotation: { name: "link" },
-        });
-      } else {
-        const url = window.prompt("Enter link URL:", "https://");
-        if (url) {
-          editor.send({
-            type: "annotation.add",
-            annotation: { name: "link", value: { href: url } },
-          });
-        }
-      }
+      editor.send({
+        type: "annotation.add",
+        annotation: { name: "link", value: { href: url } },
+      });
+    } catch (err) {
+      // Ignored
+    }
+    editor.send({ type: "focus" });
+  };
+
+  const handleRemoveLink = () => {
+    setShowLinkModal(false);
+    try {
+      editor.send({
+        type: "annotation.remove",
+        annotation: { name: "link" },
+      });
     } catch (err) {
       // Ignored
     }
@@ -145,152 +132,150 @@ export function Toolbar({ customBlocks = [] }) {
     return false;
   };
 
-  const getActiveStyleLabel = () => {
-    if (isStyleActive("h1")) return "Heading 1";
-    if (isStyleActive("h2")) return "Heading 2";
-    if (isStyleActive("blockquote")) return "Quote";
-    return "Paragraph";
-  };
-
   const allBlocks = [...PRE_BUNDLED_BLOCKS, ...customBlocks];
 
   return html`
     <div class="pe-toolbar-wrapper">
-      <div class="pe-dropdown-container">
+      <!-- Paragraph & Heading Direct Buttons -->
+      <div class="pe-toolbar-section">
         <button
-          class="pe-btn pe-dropdown-btn ${styleDropdownOpen ? "active" : ""}"
-          onClick=${(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setStyleDropdownOpen(!styleDropdownOpen);
-          }}
+          class="pe-btn ${isStyleActive("normal") ? "pe-btn-active" : ""}"
+          onPointerDown=${handleToggleStyle("normal")}
+          title="Paragraph"
         >
-          ${getActiveStyleLabel()} ▾
+          Paragraph
         </button>
-        ${styleDropdownOpen &&
-        html`
-          <div class="pe-dropdown-menu">
-            <div
-              class="pe-dropdown-item ${isStyleActive("normal")
-                ? "pe-dropdown-item-active"
-                : ""}"
-              onPointerDown=${handleToggleStyle("normal")}
-            >
-              Paragraph
-            </div>
-            <div
-              class="pe-dropdown-item ${isStyleActive("h1")
-                ? "pe-dropdown-item-active"
-                : ""}"
-              onPointerDown=${handleToggleStyle("h1")}
-            >
-              Heading 1
-            </div>
-            <div
-              class="pe-dropdown-item ${isStyleActive("h2")
-                ? "pe-dropdown-item-active"
-                : ""}"
-              onPointerDown=${handleToggleStyle("h2")}
-            >
-              Heading 2
-            </div>
-            <div
-              class="pe-dropdown-item ${isStyleActive("blockquote")
-                ? "pe-dropdown-item-active"
-                : ""}"
-              onPointerDown=${handleToggleStyle("blockquote")}
-            >
-              Quote
-            </div>
-          </div>
-        `}
-      </div>
-      <div class="pe-divider"></div>
-
-      <button
-        class="pe-btn ${isMarkActive("strong") ? "pe-btn-active" : ""}"
-        onPointerDown=${handleToggleMark("strong")}
-        title="Bold"
-      >
-        ${ICONS.bold}
-      </button>
-      <button
-        class="pe-btn ${isMarkActive("em") ? "pe-btn-active" : ""}"
-        onPointerDown=${handleToggleMark("em")}
-        title="Italic"
-      >
-        ${ICONS.italic}
-      </button>
-      <button
-        class="pe-btn ${isMarkActive("underline") ? "pe-btn-active" : ""}"
-        onPointerDown=${handleToggleMark("underline")}
-        title="Underline"
-      >
-        ${ICONS.underline}
-      </button>
-      <button
-        class="pe-btn ${isMarkActive("code") ? "pe-btn-active" : ""}"
-        onPointerDown=${handleToggleMark("code")}
-        title="Inline Code"
-      >
-        ${ICONS.code}
-      </button>
-      <button
-        class="pe-btn ${isLinkActive ? "pe-btn-active" : ""}"
-        onPointerDown=${handleToggleLink}
-        title="Link"
-      >
-        ${ICONS.link}
-      </button>
-      <div class="pe-divider"></div>
-
-      <button
-        class="pe-btn ${isListActive("bullet") ? "pe-btn-active" : ""}"
-        onPointerDown=${handleToggleList("bullet")}
-        title="Bulleted List"
-      >
-        ${ICONS.bulletList}
-      </button>
-      <button
-        class="pe-btn ${isListActive("number") ? "pe-btn-active" : ""}"
-        onPointerDown=${handleToggleList("number")}
-        title="Numbered List"
-      >
-        ${ICONS.numberedList}
-      </button>
-      <div class="pe-divider"></div>
-
-      <div class="pe-dropdown-container">
         <button
-          class="pe-btn pe-dropdown-btn ${dropdownOpen ? "active" : ""}"
-          onClick=${(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setDropdownOpen(!dropdownOpen);
-          }}
+          class="pe-btn ${isStyleActive("h1") ? "pe-btn-active" : ""}"
+          onPointerDown=${handleToggleStyle("h1")}
+          title="Heading 1"
         >
-          Insert ▾
+          H1
         </button>
-        ${dropdownOpen &&
-        html`
-          <div class="pe-dropdown-menu">
-            ${allBlocks.map(
-              (block) => html`
-                <div
-                  class="pe-dropdown-item"
-                  onPointerDown=${handleInsertBlock(block)}
-                  key=${block.name}
-                >
-                  <span class="pe-dropdown-item-icon"
-                    >${block.icon || "🧩"}</span
-                  >
-                  <span class="pe-dropdown-item-title">${block.title}</span>
-                </div>
-              `,
-            )}
-          </div>
-        `}
+        <button
+          class="pe-btn ${isStyleActive("h2") ? "pe-btn-active" : ""}"
+          onPointerDown=${handleToggleStyle("h2")}
+          title="Heading 2"
+        >
+          H2
+        </button>
+        <button
+          class="pe-btn ${isStyleActive("h3") ? "pe-btn-active" : ""}"
+          onPointerDown=${handleToggleStyle("h3")}
+          title="Heading 3"
+        >
+          H3
+        </button>
+        <button
+          class="pe-btn ${isStyleActive("h4") ? "pe-btn-active" : ""}"
+          onPointerDown=${handleToggleStyle("h4")}
+          title="Heading 4"
+        >
+          H4
+        </button>
+        <button
+          class="pe-btn ${isStyleActive("blockquote") ? "pe-btn-active" : ""}"
+          onPointerDown=${handleToggleStyle("blockquote")}
+          title="Quote"
+        >
+          ${ICONS.quote}
+        </button>
       </div>
+
+      <div class="pe-divider"></div>
+
+      <!-- Formatting Marks -->
+      <div class="pe-toolbar-section">
+        <button
+          class="pe-btn ${isMarkActive("strong") ? "pe-btn-active" : ""}"
+          onPointerDown=${handleToggleMark("strong")}
+          title="Bold"
+        >
+          ${ICONS.bold}
+        </button>
+        <button
+          class="pe-btn ${isMarkActive("em") ? "pe-btn-active" : ""}"
+          onPointerDown=${handleToggleMark("em")}
+          title="Italic"
+        >
+          ${ICONS.italic}
+        </button>
+        <button
+          class="pe-btn ${isMarkActive("underline") ? "pe-btn-active" : ""}"
+          onPointerDown=${handleToggleMark("underline")}
+          title="Underline"
+        >
+          ${ICONS.underline}
+        </button>
+        <button
+          class="pe-btn ${isMarkActive("strike") ? "pe-btn-active" : ""}"
+          onPointerDown=${handleToggleMark("strike")}
+          title="Strikethrough"
+        >
+          ${ICONS.strike}
+        </button>
+        <button
+          class="pe-btn ${isMarkActive("code") ? "pe-btn-active" : ""}"
+          onPointerDown=${handleToggleMark("code")}
+          title="Inline Code"
+        >
+          ${ICONS.code}
+        </button>
+        <button
+          class="pe-btn ${isLinkActive ? "pe-btn-active" : ""}"
+          onPointerDown=${handleOpenLinkModal}
+          title="Link"
+        >
+          ${ICONS.link}
+        </button>
+      </div>
+
+      <div class="pe-divider"></div>
+
+      <!-- Lists -->
+      <div class="pe-toolbar-section">
+        <button
+          class="pe-btn ${isListActive("bullet") ? "pe-btn-active" : ""}"
+          onPointerDown=${handleToggleList("bullet")}
+          title="Bulleted List"
+        >
+          ${ICONS.bulletList}
+        </button>
+        <button
+          class="pe-btn ${isListActive("number") ? "pe-btn-active" : ""}"
+          onPointerDown=${handleToggleList("number")}
+          title="Numbered List"
+        >
+          ${ICONS.numberedList}
+        </button>
+      </div>
+
+      <div class="pe-divider"></div>
+
+      <!-- Direct Block Insertion Buttons (No Dropdown) -->
+      <div class="pe-insert-direct-group">
+        ${allBlocks.map(
+          (block) => html`
+            <button
+              class="pe-btn pe-insert-btn"
+              onPointerDown=${handleInsertBlock(block)}
+              title="Insert ${block.title}"
+              key=${block.name}
+            >
+              <span class="pe-btn-icon">${block.icon || "🧩"}</span>
+              <span class="pe-btn-label">${block.title}</span>
+            </button>
+          `,
+        )}
+      </div>
+
+      ${showLinkModal &&
+      html`<${LinkModal}
+        isEditing=${isLinkActive}
+        onSave=${handleSaveLink}
+        onRemove=${handleRemoveLink}
+        onClose=${() => setShowLinkModal(false)}
+      />`}
     </div>
   `;
 }

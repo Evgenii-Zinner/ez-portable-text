@@ -3,7 +3,7 @@ import { BlockCardWrapper } from "./BlockCardWrapper.js";
 import { ICONS } from "../components/icons.js";
 
 /**
- * Modular Embed Block component.
+ * Modular Embed Block component with inline URL input line.
  *
  * @param {object} props
  * @param {object} props.value - Embed block JSON value.
@@ -11,6 +11,17 @@ import { ICONS } from "../components/icons.js";
  * @param {Array} props.path - Tree path inside document.
  */
 export function EmbedBlock({ value, schemaType, path }) {
+  const url = value?.url || "";
+
+  const dispatchUpdate = (patch, target) => {
+    const event = new CustomEvent("pe-update-block-data", {
+      detail: { value, patch },
+      bubbles: true,
+      composed: true,
+    });
+    target.dispatchEvent(event);
+  };
+
   return html`
     <${BlockCardWrapper}
       typeName="embed"
@@ -18,13 +29,31 @@ export function EmbedBlock({ value, schemaType, path }) {
       icon=${ICONS.puzzle}
       value=${value}
       path=${path}
+      hideEditBtn=${true}
     >
       <div class="pe-preview-video-wrapper">
-        <div class="pe-preview-video-info">
-          <span class="pe-video-play-icon">🔗</span>
-          <span class="pe-video-url"
-            >${value?.url || "No Embed URL provided"}</span
-          >
+        ${url
+          ? html`
+              <div class="pe-video-embed-container">
+                <iframe src=${url} frameborder="0" allowfullscreen></iframe>
+              </div>
+            `
+          : html`
+              <div class="pe-preview-placeholder">
+                Paste an Embed URL below (Codepen, Figma, Spotify, etc.)
+              </div>
+            `}
+      </div>
+
+      <div class="pe-image-meta-fields">
+        <div class="pe-inline-field-row">
+          <input
+            type="text"
+            class="pe-inline-input"
+            placeholder="Paste Embed URL (https://...)..."
+            value=${url}
+            onInput=${(e) => dispatchUpdate({ url: e.target.value }, e.target)}
+          />
         </div>
       </div>
     <//>

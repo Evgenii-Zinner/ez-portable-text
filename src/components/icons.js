@@ -83,6 +83,19 @@ export const ICONS = {
     <path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3" />
     <line x1="4" y1="21" x2="20" y2="21" />
   </svg>`,
+  strike: html`<svg
+    width="12"
+    height="12"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M16 4H9a3 3 0 0 0-2.83 4M14 12a4 4 0 0 1 0 8H6" />
+    <line x1="4" y1="12" x2="20" y2="12" />
+  </svg>`,
   code: html`<svg
     width="12"
     height="12"
@@ -227,6 +240,46 @@ export const ICONS = {
       d="M12 2v4M12 18v4M4 12H2M22 12h-4M16 8a4 4 0 0 0-8 0v8a4 4 0 0 0 8 0V8z"
     />
   </svg>`,
+  card: html`<svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <path d="M7 8h10M7 12h10M7 16h6" />
+  </svg>`,
+  bento: html`<svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <rect x="3" y="3" width="8" height="8" rx="1" />
+    <rect x="13" y="3" width="8" height="12" rx="1" />
+    <rect x="3" y="13" width="8" height="8" rx="1" />
+    <rect x="13" y="17" width="8" height="4" rx="1" />
+  </svg>`,
+  hero: html`<svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+  </svg>`,
 };
 
 /**
@@ -239,6 +292,31 @@ export const PRE_BUNDLED_BLOCKS = [
     title: "Image",
     icon: ICONS.image,
     defaultValue: { url: "", alt: "", caption: "" },
+  },
+  {
+    name: "hero",
+    title: "Hero Banner",
+    icon: ICONS.hero,
+    defaultValue: { title: "", subtitle: "", imageUrl: "" },
+  },
+  {
+    name: "card",
+    title: "Card",
+    icon: ICONS.card,
+    defaultValue: { title: "", description: "", imageUrl: "", badge: "", linkUrl: "" },
+  },
+  {
+    name: "bentoGrid",
+    title: "Bento Grid",
+    icon: ICONS.bento,
+    defaultValue: {
+      sectionTitle: "",
+      columns: 3,
+      cards: [
+        { _key: "b1", title: "Feature 1", description: "Details...", badge: "NEW", colSpan: 2 },
+        { _key: "b2", title: "Feature 2", description: "Details...", badge: "FAST", colSpan: 1 },
+      ],
+    },
   },
   {
     name: "video",
@@ -261,6 +339,6 @@ export const PRE_BUNDLED_BLOCKS = [
     name: "codeBlock",
     title: "Code Block",
     icon: ICONS.codeBlock,
-    defaultValue: { code: "", language: "javascript", filename: "" },
+    defaultValue: { code: "", language: "typescript", filename: "" },
   },
 ];

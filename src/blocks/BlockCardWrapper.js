@@ -10,9 +10,18 @@ import { ICONS } from "../components/icons.js";
  * @param {object} [props.icon] - Icon JSX or string.
  * @param {object} [props.value] - Block JSON value.
  * @param {Array} [props.path] - Tree path inside PortableText document.
+ * @param {import('htm/preact').Html} [props.headerActions] - Custom header action buttons.
  * @param {import('htm/preact').Html} props.children - Custom block preview body.
  */
-export function BlockCardWrapper({ typeName, title, icon, value, path, children }) {
+export function BlockCardWrapper({
+  typeName,
+  title,
+  icon,
+  value,
+  path,
+  headerActions,
+  children,
+}) {
   const dispatchAction = (eventName, e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -35,6 +44,7 @@ export function BlockCardWrapper({ typeName, title, icon, value, path, children 
           <span class="pe-block-card-name">${title}</span>
         </div>
         <div class="pe-block-card-actions">
+          ${headerActions}
           <button
             type="button"
             class="pe-block-action-btn pe-action-up"
@@ -66,14 +76,6 @@ export function BlockCardWrapper({ typeName, title, icon, value, path, children 
             onClick=${(e) => dispatchAction("pe-delete-block", e)}
           >
             🗑
-          </button>
-          <button
-            type="button"
-            class="pe-block-card-edit-btn"
-            title="Edit Options"
-            onClick=${(e) => dispatchAction("pe-edit-block", e)}
-          >
-            Edit
           </button>
         </div>
       </div>

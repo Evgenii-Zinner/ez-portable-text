@@ -102,12 +102,15 @@ export function createEditorSchema(customBlocks = []) {
       { name: "strong", title: "Strong" },
       { name: "em", title: "Emphasis" },
       { name: "underline", title: "Underline" },
+      { name: "strike", title: "Strike" },
       { name: "code", title: "Code" },
     ],
     styles: [
       { name: "normal", title: "Normal" },
       { name: "h1", title: "Heading 1" },
       { name: "h2", title: "Heading 2" },
+      { name: "h3", title: "Heading 3" },
+      { name: "h4", title: "Heading 4" },
       { name: "blockquote", title: "Quote" },
     ],
     annotations: [
@@ -132,6 +135,7 @@ function renderDecorator(props) {
   if (props.value === "strong") return html`<strong>${props.children}</strong>`;
   if (props.value === "em") return html`<em>${props.children}</em>`;
   if (props.value === "underline") return html`<u>${props.children}</u>`;
+  if (props.value === "strike") return html`<s>${props.children}</s>`;
   if (props.value === "code")
     return html`<code class="pe-code-span">${props.children}</code>`;
 
@@ -152,6 +156,10 @@ function renderStyle(props) {
     return html`<h1 class="pe-h1">${props.children}</h1>`;
   if (props.value === "h2")
     return html`<h2 class="pe-h2">${props.children}</h2>`;
+  if (props.value === "h3")
+    return html`<h3 class="pe-h3">${props.children}</h3>`;
+  if (props.value === "h4")
+    return html`<h4 class="pe-h4">${props.children}</h4>`;
   if (props.value === "blockquote")
     return html`<blockquote class="pe-blockquote">
       ${props.children}

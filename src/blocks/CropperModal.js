@@ -2,7 +2,7 @@ import { html } from "htm/preact";
 import { useState, useRef, useEffect } from "preact/hooks";
 
 /**
- * In-Browser HTML5 Canvas Image Cropper & Resizer with PageSpeed Presets.
+ * Viewport-centered HTML5 Canvas Image Cropper & Resizer with interactive Zoom, Pan, and PageSpeed Presets.
  *
  * @param {object} props
  * @param {string} props.imageUrl - Source image URL or DataURL.
@@ -12,9 +12,23 @@ import { useState, useRef, useEffect } from "preact/hooks";
 export function CropperModal({ imageUrl, onCropSave, onClose }) {
   const [targetWidth, setTargetWidth] = useState(1200);
   const [targetHeight, setTargetHeight] = useState(675);
+  const [zoom, setZoom] = useState(1.0);
+  const [panX, setPanX] = useState(0);
+  const [panY, setPanY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
   const canvasRef = useRef(null);
   const imgRef = useRef(null);
   const [isLoaded, setIsLoaded] = useState(false);
+
+  // Prevent background page scrolling while modal is open
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
 
   useEffect(() => {
     if (!imageUrl) return;
@@ -23,52 +37,123 @@ export function CropperModal({ imageUrl, onCropSave, onClose }) {
     img.onload = () => {
       imgRef.current = img;
       setIsLoaded(true);
-      drawPreview(img, targetWidth, targetHeight);
+      setPanX(0);
+      setPanY(0);
+      setZoom(1.0);
+      drawCanvas(img, targetWidth, targetHeight, 1.0, 0, 0);
     };
     img.src = imageUrl;
   }, [imageUrl]);
 
-  const drawPreview = (img, w, h) => {
+  useEffect(() => {
+    if (imgRef.current && isLoaded) {
+      drawCanvas(imgRef.current, targetWidth, targetHeight, zoom, panX, panY);
+    }
+  }, [targetWidth, targetHeight, zoom, panX, panY, isLoaded]);
+
+  const drawCanvas = (img, w, h, zScale, px, py) => {
     const canvas = canvasRef.current;
     if (!canvas || !img) return;
 
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, w, h);
+    // Display scale preview resolution
+    const maxDisplayW = 600;
+    const maxDisplayH = 340;
+    const aspect = w / h;
 
-    // Cover fit draw
-    const imgRatio = img.width / img.height;
-    const targetRatio = w / h;
-    let renderW, renderH, offsetX, offsetY;
-
-    if (imgRatio > targetRatio) {
-      renderH = img.height;
-      renderW = img.height * targetRatio;
-      offsetX = (img.width - renderW) / 2;
-      offsetY = 0;
-    } else {
-      renderW = img.width;
-      renderH = img.width / targetRatio;
-      offsetX = 0;
-      offsetY = (img.height - renderH) / 2;
+    let displayW = maxDisplayW;
+    let displayH = maxDisplayW / aspect;
+    if (displayH > maxDisplayH) {
+      displayH = maxDisplayH;
+      displayW = maxDisplayH * aspect;
     }
 
-    ctx.drawImage(img, offsetX, offsetY, renderW, renderH, 0, 0, w, h);
+    canvas.width = displayW;
+    canvas.height = displayH;
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, displayW, displayH);
+
+    // Calculate base draw size to cover canvas
+    const imgRatio = img.width / img.height;
+    let baseW, baseH;
+    if (imgRatio > aspect) {
+      baseH = displayH;
+      baseW = displayH * imgRatio;
+    } else {
+      baseW = displayW;
+      baseH = displayW / imgRatio;
+    }
+
+    const scaledW = baseW * zScale;
+    const scaledH = baseH * zScale;
+
+    // Center offset + pan
+    const centerX = (displayW - scaledW) / 2 + px;
+    const centerY = (displayH - scaledH) / 2 + py;
+
+    ctx.drawImage(img, centerX, centerY, scaledW, scaledH);
+  };
+
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    setDragStart({ x: e.clientX - panX, y: e.clientY - panY });
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    setPanX(e.clientX - dragStart.x);
+    setPanY(e.clientY - dragStart.y);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleWheel = (e) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.1 : 0.1;
+    setZoom((prev) => Math.min(Math.max(1.0, prev + delta), 4.0));
   };
 
   const handleApplyPreset = (w, h) => {
     setTargetWidth(w);
     setTargetHeight(h);
-    if (imgRef.current) {
-      drawPreview(imgRef.current, w, h);
-    }
+    setPanX(0);
+    setPanY(0);
+    setZoom(1.0);
   };
 
   const handleSave = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const croppedDataUrl = canvas.toDataURL("image/webp", 0.85);
+    const img = imgRef.current;
+    if (!img) return;
+
+    // High resolution output canvas at exact target dimensions (e.g. 1200x675)
+    const exportCanvas = document.createElement("canvas");
+    exportCanvas.width = targetWidth;
+    exportCanvas.height = targetHeight;
+    const ctx = exportCanvas.getContext("2d");
+
+    const aspect = targetWidth / targetHeight;
+    const imgRatio = img.width / img.height;
+    let baseW, baseH;
+    if (imgRatio > aspect) {
+      baseH = targetHeight;
+      baseW = targetHeight * imgRatio;
+    } else {
+      baseW = targetWidth;
+      baseH = targetWidth / imgRatio;
+    }
+
+    // Scale pan factor from preview display canvas to high-res target canvas
+    const previewDisplayW = canvasRef.current?.width || 600;
+    const scaleFactor = targetWidth / previewDisplayW;
+
+    const scaledW = baseW * zoom;
+    const scaledH = baseH * zoom;
+    const centerX = (targetWidth - scaledW) / 2 + panX * scaleFactor;
+    const centerY = (targetHeight - scaledH) / 2 + panY * scaleFactor;
+
+    ctx.drawImage(img, centerX, centerY, scaledW, scaledH);
+    const croppedDataUrl = exportCanvas.toDataURL("image/webp", 0.85);
     onCropSave(croppedDataUrl);
   };
 
@@ -85,21 +170,21 @@ export function CropperModal({ imageUrl, onCropSave, onClose }) {
             <span class="pe-cropper-label">PageSpeed Recommended Presets:</span>
             <button
               type="button"
-              class="pe-preset-btn ${targetWidth === 1200 && targetHeight === 675 ? 'active' : ''}"
+              class="pe-preset-btn ${targetWidth === 1200 && targetHeight === 675 ? "active" : ""}"
               onClick=${() => handleApplyPreset(1200, 675)}
             >
               1200 × 675 px (16:9 Recommended)
             </button>
             <button
               type="button"
-              class="pe-preset-btn ${targetWidth === 800 && targetHeight === 600 ? 'active' : ''}"
+              class="pe-preset-btn ${targetWidth === 800 && targetHeight === 600 ? "active" : ""}"
               onClick=${() => handleApplyPreset(800, 600)}
             >
               800 × 600 px (4:3 Article)
             </button>
             <button
               type="button"
-              class="pe-preset-btn ${targetWidth === 600 && targetHeight === 600 ? 'active' : ''}"
+              class="pe-preset-btn ${targetWidth === 600 && targetHeight === 600 ? "active" : ""}"
               onClick=${() => handleApplyPreset(600, 600)}
             >
               600 × 600 px (1:1 Square)
@@ -113,11 +198,7 @@ export function CropperModal({ imageUrl, onCropSave, onClose }) {
                 type="number"
                 class="pe-dim-input"
                 value=${targetWidth}
-                onInput=${(e) => {
-                  const val = parseInt(e.target.value) || 100;
-                  setTargetWidth(val);
-                  if (imgRef.current) drawPreview(imgRef.current, val, targetHeight);
-                }}
+                onInput=${(e) => setTargetWidth(parseInt(e.target.value) || 100)}
               />
             </label>
             <span class="pe-dim-separator">×</span>
@@ -127,25 +208,42 @@ export function CropperModal({ imageUrl, onCropSave, onClose }) {
                 type="number"
                 class="pe-dim-input"
                 value=${targetHeight}
-                onInput=${(e) => {
-                  const val = parseInt(e.target.value) || 100;
-                  setTargetHeight(val);
-                  if (imgRef.current) drawPreview(imgRef.current, targetWidth, val);
-                }}
+                onInput=${(e) => setTargetHeight(parseInt(e.target.value) || 100)}
               />
             </label>
+            <div class="pe-cropper-zoom-control">
+              <span>Zoom:</span>
+              <input
+                type="range"
+                min="1.0"
+                max="3.0"
+                step="0.05"
+                value=${zoom}
+                onInput=${(e) => setZoom(parseFloat(e.target.value))}
+              />
+              <span>${Math.round(zoom * 100)}%</span>
+            </div>
           </div>
 
-          <div class="pe-cropper-canvas-wrapper">
+          <div
+            class="pe-cropper-canvas-wrapper"
+            onMouseDown=${handleMouseDown}
+            onMouseMove=${handleMouseMove}
+            onMouseUp=${handleMouseUp}
+            onMouseLeave=${handleMouseUp}
+            onWheel=${handleWheel}
+            style="cursor: ${isDragging ? "grabbing" : "grab"};"
+          >
             <canvas ref=${canvasRef} class="pe-cropper-canvas"></canvas>
             ${!isLoaded && html`<div class="pe-preview-placeholder">Loading image...</div>`}
           </div>
+          <div class="pe-cropper-hint">💡 Drag image to position • Scroll mouse wheel to zoom</div>
         </div>
 
         <div class="pe-cropper-footer">
           <button type="button" class="pe-btn" onClick=${onClose}>Cancel</button>
           <button type="button" class="pe-btn pe-btn-active" onClick=${handleSave}>
-            Apply Crop & Resize
+            Apply Crop & Resize (${targetWidth} × ${targetHeight} px)
           </button>
         </div>
       </div>

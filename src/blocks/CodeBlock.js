@@ -1,9 +1,23 @@
 import { html } from "htm/preact";
+import { useState, useEffect } from "preact/hooks";
 import { BlockCardWrapper } from "./BlockCardWrapper.js";
 import { ICONS } from "../components/icons.js";
 
+const LANGUAGES = [
+  { id: "typescript", label: "TypeScript" },
+  { id: "javascript", label: "JavaScript" },
+  { id: "html", label: "HTML" },
+  { id: "css", label: "CSS" },
+  { id: "bash", label: "Bash / Shell" },
+  { id: "json", label: "JSON" },
+  { id: "sql", label: "SQL" },
+  { id: "python", label: "Python" },
+  { id: "go", label: "Go" },
+  { id: "rust", label: "Rust" },
+];
+
 /**
- * Interactive Code Block renderer with inline editing & typescript default.
+ * Interactive Code Block renderer with custom editor dropdown & typescript default.
  *
  * @param {object} props
  * @param {object} props.value - Code block JSON value.
@@ -11,9 +25,17 @@ import { ICONS } from "../components/icons.js";
  * @param {Array} props.path - Tree path inside document.
  */
 export function CodeBlock({ value, schemaType, path }) {
+  const [langOpen, setLangOpen] = useState(false);
   const language = value?.language || "typescript";
   const filename = value?.filename || "";
   const code = value?.code || "";
+
+  useEffect(() => {
+    if (!langOpen) return;
+    const handleClose = () => setLangOpen(false);
+    document.addEventListener("click", handleClose);
+    return () => document.removeEventListener("click", handleClose);
+  }, [langOpen]);
 
   const dispatchUpdate = (patch, target) => {
     const event = new CustomEvent("pe-update-block-data", {
@@ -24,10 +46,6 @@ export function CodeBlock({ value, schemaType, path }) {
     target.dispatchEvent(event);
   };
 
-  const handleLangChange = (e) => {
-    dispatchUpdate({ language: e.target.value }, e.target);
-  };
-
   const handleFilenameChange = (e) => {
     dispatchUpdate({ filename: e.target.value }, e.target);
   };
@@ -35,6 +53,8 @@ export function CodeBlock({ value, schemaType, path }) {
   const handleCodeChange = (e) => {
     dispatchUpdate({ code: e.target.value }, e.target);
   };
+
+  const currentLangObj = LANGUAGES.find((l) => l.id === language) || LANGUAGES[0];
 
   return html`
     <${BlockCardWrapper}
@@ -46,22 +66,42 @@ export function CodeBlock({ value, schemaType, path }) {
     >
       <div class="pe-preview-code-wrapper">
         <div class="pe-code-header">
-          <select
-            class="pe-code-lang-select"
-            value=${language}
-            onChange=${handleLangChange}
-          >
-            <option value="typescript">TypeScript</option>
-            <option value="javascript">JavaScript</option>
-            <option value="html">HTML</option>
-            <option value="css">CSS</option>
-            <option value="bash">Bash / Shell</option>
-            <option value="json">JSON</option>
-            <option value="sql">SQL</option>
-            <option value="python">Python</option>
-            <option value="go">Go</option>
-            <option value="rust">Rust</option>
-          </select>
+          <div class="pe-dropdown-container">
+            <button
+              type="button"
+              class="pe-btn pe-dropdown-btn ${langOpen ? "active" : ""}"
+              onClick=${(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLangOpen(!langOpen);
+              }}
+            >
+              ${currentLangObj.label} ▾
+            </button>
+            ${langOpen &&
+            html`
+              <div class="pe-dropdown-menu">
+                ${LANGUAGES.map(
+                  (l) => html`
+                    <div
+                      class="pe-dropdown-item ${language === l.id
+                        ? "pe-dropdown-item-active"
+                        : ""}"
+                      onClick=${(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setLangOpen(false);
+                        dispatchUpdate({ language: l.id }, e.target);
+                      }}
+                      key=${l.id}
+                    >
+                      ${l.label}
+                    </div>
+                  `,
+                )}
+              </div>
+            `}
+          </div>
 
           <input
             type="text"
