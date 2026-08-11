@@ -41,19 +41,27 @@
   font-family: var(--pe-font-sans);
 }
 
+/* Sticky Header Container */
+.pe-sticky-header {
+  position: sticky;
+  top: -3rem;
+  z-index: 1000;
+  background: var(--pe-bg-secondary);
+  border-bottom: 1px solid var(--pe-border);
+  border-radius: var(--pe-radius) var(--pe-radius) 0 0;
+  box-sizing: border-box;
+  width: 100%;
+}
+
 /* Top Toolbar */
 .pe-toolbar-wrapper {
-  z-index: 1000;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 6px;
   padding: 8px 12px;
   background: var(--pe-bg-secondary);
-  border-bottom: 1px solid var(--pe-border);
-  position: sticky;
-  top: -1rem;
-  flex-wrap: wrap;
+  border-top: 1px solid var(--pe-border);
 }
 
 .pe-toolbar-section {
@@ -108,6 +116,7 @@
 .pe-visual-canvas [data-portabletext-block] {
   margin: 0 0 1em 0;
 }
+
 .pe-visual-canvas [data-portabletext-block]:last-child {
   margin-bottom: 0;
 }
@@ -205,11 +214,8 @@
 .pe-tabs {
   display: flex;
   background: var(--pe-bg-secondary);
-  border-bottom: 1px solid var(--pe-border);
-  position: sticky;
-  top: -3rem;
-  z-index: 1001;
 }
+
 .pe-tab {
   padding: 8px 16px;
   cursor: pointer;
@@ -219,6 +225,7 @@
   border-bottom: 2px solid transparent;
   transition: all var(--pe-transition);
 }
+
 .pe-tab.active {
   color: var(--pe-accent);
   border-bottom-color: var(--pe-accent);
@@ -241,15 +248,19 @@
 .pe-json-view .string {
   color: #a5d6ff;
 }
+
 .pe-json-view .number {
   color: #79c0ff;
 }
+
 .pe-json-view .boolean {
   color: #ff7b72;
 }
+
 .pe-json-view .null {
   color: #ff7b72;
 }
+
 .pe-json-view .key {
   color: #d2a8ff;
 }
@@ -623,7 +634,8 @@
 .pe-json-gutter-line {
   padding-right: 10px;
   line-height: 1.5;
-  height: 19.5px; /* Matches 13px * 1.5 exact line height */
+  height: 19.5px;
+  /* Matches 13px * 1.5 exact line height */
 }
 
 .pe-json-textarea {
@@ -1049,12 +1061,12 @@
   transition: all var(--pe-transition);
 }
 
-.pe-toggle-switch input:checked + .pe-toggle-slider {
+.pe-toggle-switch input:checked+.pe-toggle-slider {
   background: rgba(16, 185, 129, 0.2);
   border-color: var(--pe-accent);
 }
 
-.pe-toggle-switch input:checked + .pe-toggle-slider::before {
+.pe-toggle-switch input:checked+.pe-toggle-slider::before {
   transform: translateX(14px);
   background: var(--pe-accent);
 }
@@ -1066,7 +1078,7 @@
   color: var(--pe-text-secondary);
 }
 
-.pe-toggle-switch input:checked ~ .pe-toggle-label {
+.pe-toggle-switch input:checked~.pe-toggle-label {
   color: var(--pe-accent);
 }
 

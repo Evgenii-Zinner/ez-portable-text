@@ -535,21 +535,6 @@ export function EditorUI({
 
   return html`
     <div ref=${containerRef} class="pe-editor-container pe-theme-dark">
-      <div class="pe-tabs">
-        <div
-          class="pe-tab ${activeTab === "visual" ? "active" : ""}"
-          onClick=${() => setActiveTab("visual")}
-        >
-          Visual Editor
-        </div>
-        <div
-          class="pe-tab ${activeTab === "json" ? "active" : ""}"
-          onClick=${() => setActiveTab("json")}
-        >
-          JSON
-        </div>
-      </div>
-
       <${EditorProvider}
         key=${schemaKey}
         initialConfig=${{
@@ -563,6 +548,27 @@ export function EditorUI({
           onEditorInit=${handleEditorInit}
         />
 
+        <div class="pe-sticky-header">
+          <div class="pe-tabs">
+            <div
+              class="pe-tab ${activeTab === "visual" ? "active" : ""}"
+              onClick=${() => setActiveTab("visual")}
+            >
+              Visual Editor
+            </div>
+            <div
+              class="pe-tab ${activeTab === "json" ? "active" : ""}"
+              onClick=${() => setActiveTab("json")}
+            >
+              JSON
+            </div>
+          </div>
+
+          <div style=${{ display: activeTab === "visual" ? "block" : "none" }}>
+            <${Toolbar} customBlocks=${customBlocks} />
+          </div>
+        </div>
+
         <div
           style=${{
             display: activeTab === "visual" ? "flex" : "none",
@@ -570,7 +576,6 @@ export function EditorUI({
             flex: 1,
           }}
         >
-          <${Toolbar} customBlocks=${customBlocks} />
           <div class="pe-visual-canvas">
             <${PortableTextEditable}
               renderDecorator=${renderDecorator}

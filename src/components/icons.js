@@ -166,9 +166,9 @@ export const ICONS = {
     <line x1="10" y1="6" x2="21" y2="6" />
     <line x1="10" y1="12" x2="21" y2="12" />
     <line x1="10" y1="18" x2="21" y2="18" />
-    <path
-      d="M4 6H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h1v4zm0 6H3a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2v-4zm-2 6h4"
-    />
+    <path d="M4 6h1v4" />
+    <path d="M4 10h2" />
+    <path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1" />
   </svg>`,
   image: html`<svg
     width="14"
