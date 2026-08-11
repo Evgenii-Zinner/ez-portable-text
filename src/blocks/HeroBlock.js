@@ -5,7 +5,7 @@ import { CropperModal } from "./CropperModal.js";
 import { ICONS } from "../components/icons.js";
 
 /**
- * Interactive Hero Banner Block component with local image file upload & PageSpeed cropper.
+ * Interactive Hero Banner Block component with direct inline overlay editing.
  *
  * @param {object} props
  * @param {object} props.value - Hero block JSON value.
@@ -19,7 +19,7 @@ export function HeroBlock({ value, schemaType, path }) {
 
   const title = value?.title || "";
   const subtitle = value?.subtitle || "";
-  const imageUrl = value?.imageUrl || "";
+  const imageUrl = value?.imageUrl || value?.url || "";
 
   const dispatchUpdate = (patch, target) => {
     const event = new CustomEvent("pe-update-block-data", {
@@ -43,11 +43,11 @@ export function HeroBlock({ value, schemaType, path }) {
     e.target.value = "";
   };
 
-  const handleCroppedSave = (croppedDataUrl) => {
+  const handleCroppedSave = (croppedUrl) => {
     setShowCropper(false);
     const cardEl = document.querySelector(`[data-block-type="hero"]`);
     if (cardEl) {
-      dispatchUpdate({ imageUrl: croppedDataUrl }, cardEl);
+      dispatchUpdate({ imageUrl: croppedUrl }, cardEl);
     }
   };
 
@@ -58,11 +58,11 @@ export function HeroBlock({ value, schemaType, path }) {
   const headerActions = html`
     <button
       type="button"
-      class="pe-upload-header-btn"
-      title="Upload & Crop Banner Image"
+      class="pe-block-action-btn"
+      title="Upload Image"
       onClick=${triggerFileUpload}
     >
-      📷 Upload Image
+      ${ICONS.image}
     </button>
     <input
       type="file"
@@ -77,32 +77,55 @@ export function HeroBlock({ value, schemaType, path }) {
     <${BlockCardWrapper}
       typeName="hero"
       title=${schemaType?.title || "Hero Banner"}
-      icon=${ICONS.puzzle}
+      icon=${ICONS.hero}
       value=${value}
       path=${path}
-      hideEditBtn=${true}
       headerActions=${headerActions}
     >
-      <div
-        class="pe-preview-hero-wrapper"
-        style=${imageUrl ? { backgroundImage: `url(${imageUrl})` } : {}}
-      >
-        <div class="pe-preview-hero-overlay">
-          <input
-            type="text"
-            class="pe-hero-title-input"
-            placeholder="Hero Title..."
-            value=${title}
-            onInput=${(e) => dispatchUpdate({ title: e.target.value }, e.target)}
-          />
-          <input
-            type="text"
-            class="pe-hero-subtitle-input"
-            placeholder="Hero Subtitle..."
-            value=${subtitle}
-            onInput=${(e) => dispatchUpdate({ subtitle: e.target.value }, e.target)}
-          />
-        </div>
+      <div class="pe-hero-preview-container">
+        ${imageUrl
+          ? html`
+              <div class="pe-hero-banner-preview">
+                <img class="pe-hero-bg-img" src=${imageUrl} alt=${title} />
+                <div class="pe-hero-overlay">
+                  <input
+                    type="text"
+                    class="pe-hero-title-input"
+                    placeholder="Hero Title (e.g. Vibecoding a Cosmic Arcade)..."
+                    value=${title}
+                    onInput=${(e) => dispatchUpdate({ title: e.target.value }, e.target)}
+                  />
+                  <input
+                    type="text"
+                    class="pe-hero-subtitle-input"
+                    placeholder="Hero Subtitle..."
+                    value=${subtitle}
+                    onInput=${(e) => dispatchUpdate({ subtitle: e.target.value }, e.target)}
+                  />
+                </div>
+              </div>
+            `
+          : html`
+              <div class="pe-preview-placeholder pe-placeholder-clickable" onClick=${triggerFileUpload}>
+                No Hero Image provided. Click <strong>"Upload Image"</strong> icon to select a 1200×675 banner image.
+              </div>
+              <div class="pe-hero-fields">
+                <input
+                  type="text"
+                  class="pe-inline-input"
+                  placeholder="Hero Title..."
+                  value=${title}
+                  onInput=${(e) => dispatchUpdate({ title: e.target.value }, e.target)}
+                />
+                <input
+                  type="text"
+                  class="pe-inline-input"
+                  placeholder="Hero Subtitle..."
+                  value=${subtitle}
+                  onInput=${(e) => dispatchUpdate({ subtitle: e.target.value }, e.target)}
+                />
+              </div>
+            `}
       </div>
 
       ${showCropper &&
