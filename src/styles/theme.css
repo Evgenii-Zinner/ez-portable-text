@@ -39,6 +39,15 @@
   background: var(--pe-bg-primary);
   color: var(--pe-text-primary);
   font-family: var(--pe-font-sans);
+  outline: none !important;
+}
+
+.pe-editor-container:focus,
+.pe-editor-container:focus-within,
+[contenteditable="true"]:focus,
+[contenteditable="true"]:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* Sticky Header Container */
