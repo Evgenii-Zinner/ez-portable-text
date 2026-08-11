@@ -5,7 +5,8 @@ import { CropperModal } from "./CropperModal.js";
 import { ICONS } from "../components/icons.js";
 
 /**
- * Interactive Image Block component with local image upload, inline caption/alt fields, and viewport-centered PageSpeed cropper.
+ * Interactive Image Block component with Styled toggle switch,
+ * local file upload, inline metadata fields, and portal-rendered cropper.
  *
  * @param {object} props
  * @param {object} props.value - Image block JSON value.
@@ -20,6 +21,7 @@ export function ImageBlock({ value, schemaType, path }) {
   const url = value?.url || "";
   const alt = value?.alt || "";
   const caption = value?.caption || "";
+  const isStyled = value?.variant !== "simple" && !value?.simple;
 
   const dispatchUpdate = (patch, target) => {
     const event = new CustomEvent("pe-update-block-data", {
@@ -56,13 +58,31 @@ export function ImageBlock({ value, schemaType, path }) {
   };
 
   const headerActions = html`
+    <label class="pe-toggle-switch" title="Toggle Styled vs Simple image frame">
+      <input
+        type="checkbox"
+        checked=${isStyled}
+        onChange=${(e) => {
+          const checked = e.target.checked;
+          dispatchUpdate(
+            {
+              variant: checked ? "styled" : "simple",
+              simple: !checked,
+            },
+            e.target,
+          );
+        }}
+      />
+      <span class="pe-toggle-slider"></span>
+      <span class="pe-toggle-label">Styled</span>
+    </label>
     <button
       type="button"
-      class="pe-upload-header-btn"
+      class="pe-block-action-btn"
       title="Upload Image"
       onClick=${triggerFileUpload}
     >
-      📷 Upload Image
+      ${ICONS.image}
     </button>
     <input
       type="file"
@@ -85,23 +105,13 @@ export function ImageBlock({ value, schemaType, path }) {
       <div class="pe-preview-image-wrapper">
         ${url
           ? html`
-              <div class="pe-image-display-container">
+              <div class="pe-image-display-container ${isStyled ? "pe-image-styled" : "pe-image-simple"}">
                 <img class="pe-preview-image" src=${url} alt=${alt} />
-                <button
-                  type="button"
-                  class="pe-crop-overlay-btn"
-                  onClick=${() => {
-                    setCropSource(url);
-                    setShowCropper(true);
-                  }}
-                >
-                  ✂️ Crop & Adjust Image
-                </button>
               </div>
             `
           : html`
               <div class="pe-preview-placeholder pe-placeholder-clickable" onClick=${triggerFileUpload}>
-                No Image provided. Click <strong>"📷 Upload Image"</strong> to upload an image.
+                No Image provided. Click <strong>"Upload Image"</strong> to select an image.
               </div>
             `}
       </div>

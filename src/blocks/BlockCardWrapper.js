@@ -2,7 +2,7 @@ import { html } from "htm/preact";
 import { ICONS } from "../components/icons.js";
 
 /**
- * Common card container wrapper for PortableText blocks with action toolbar.
+ * Common card container wrapper for PortableText blocks with standardized SVG action toolbar.
  *
  * @param {object} props
  * @param {string} props.typeName - Block type identifier.
@@ -51,7 +51,7 @@ export function BlockCardWrapper({
             title="Move Up"
             onClick=${(e) => dispatchAction("pe-move-block-up", e)}
           >
-            ↑
+            ${ICONS.up}
           </button>
           <button
             type="button"
@@ -59,7 +59,7 @@ export function BlockCardWrapper({
             title="Move Down"
             onClick=${(e) => dispatchAction("pe-move-block-down", e)}
           >
-            ↓
+            ${ICONS.down}
           </button>
           <button
             type="button"
@@ -67,7 +67,7 @@ export function BlockCardWrapper({
             title="Duplicate Block"
             onClick=${(e) => dispatchAction("pe-duplicate-block", e)}
           >
-            📋
+            ${ICONS.duplicate}
           </button>
           <button
             type="button"
@@ -75,7 +75,7 @@ export function BlockCardWrapper({
             title="Delete Block"
             onClick=${(e) => dispatchAction("pe-delete-block", e)}
           >
-            🗑
+            ${ICONS.trash}
           </button>
         </div>
       </div>

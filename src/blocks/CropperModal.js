@@ -1,8 +1,10 @@
 import { html } from "htm/preact";
 import { useState, useRef, useEffect } from "preact/hooks";
+import { createPortal } from "preact/compat";
 
 /**
- * Viewport-centered HTML5 Canvas Image Cropper & Resizer with interactive Zoom, Pan, and PageSpeed Presets.
+ * Viewport-centered HTML5 Canvas Image Cropper & Resizer rendered via document.body Portal.
+ * Supports zoom out to 50% (0.5x) and zoom in to 400% (4.0x).
  *
  * @param {object} props
  * @param {string} props.imageUrl - Source image URL or DataURL.
@@ -110,8 +112,8 @@ export function CropperModal({ imageUrl, onCropSave, onClose }) {
 
   const handleWheel = (e) => {
     e.preventDefault();
-    const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    setZoom((prev) => Math.min(Math.max(1.0, prev + delta), 4.0));
+    const delta = e.deltaY > 0 ? -0.05 : 0.05;
+    setZoom((prev) => Math.min(Math.max(0.5, prev + delta), 4.0));
   };
 
   const handleApplyPreset = (w, h) => {
@@ -126,7 +128,7 @@ export function CropperModal({ imageUrl, onCropSave, onClose }) {
     const img = imgRef.current;
     if (!img) return;
 
-    // High resolution output canvas at exact target dimensions (e.g. 1200x675)
+    // High resolution output canvas at exact target dimensions
     const exportCanvas = document.createElement("canvas");
     exportCanvas.width = targetWidth;
     exportCanvas.height = targetHeight;
@@ -157,11 +159,11 @@ export function CropperModal({ imageUrl, onCropSave, onClose }) {
     onCropSave(croppedDataUrl);
   };
 
-  return html`
+  const modalContent = html`
     <div class="pe-cropper-overlay" onClick=${onClose}>
       <div class="pe-cropper-modal" onClick=${(e) => e.stopPropagation()}>
         <div class="pe-cropper-header">
-          <span class="pe-cropper-title">✂️ In-Browser Image Cropper & Resizer</span>
+          <span class="pe-cropper-title">Upload image</span>
           <button type="button" class="pe-cropper-close" onClick=${onClose}>×</button>
         </div>
 
@@ -215,7 +217,7 @@ export function CropperModal({ imageUrl, onCropSave, onClose }) {
               <span>Zoom:</span>
               <input
                 type="range"
-                min="1.0"
+                min="0.5"
                 max="3.0"
                 step="0.05"
                 value=${zoom}
@@ -237,7 +239,7 @@ export function CropperModal({ imageUrl, onCropSave, onClose }) {
             <canvas ref=${canvasRef} class="pe-cropper-canvas"></canvas>
             ${!isLoaded && html`<div class="pe-preview-placeholder">Loading image...</div>`}
           </div>
-          <div class="pe-cropper-hint">💡 Drag image to position • Scroll mouse wheel to zoom</div>
+          <div class="pe-cropper-hint">💡 Drag image to position • Scroll mouse wheel to zoom (50% - 400%)</div>
         </div>
 
         <div class="pe-cropper-footer">
@@ -249,4 +251,6 @@ export function CropperModal({ imageUrl, onCropSave, onClose }) {
       </div>
     </div>
   `;
+
+  return createPortal(modalContent, document.body);
 }

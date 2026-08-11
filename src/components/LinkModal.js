@@ -1,8 +1,9 @@
 import { html } from "htm/preact";
 import { useState, useEffect, useRef } from "preact/hooks";
+import { createPortal } from "preact/compat";
 
 /**
- * Viewport-centered Link Modal replacing native browser prompt.
+ * Viewport-centered Link Modal rendered via document.body Portal replacing native browser prompt.
  *
  * @param {object} props
  * @param {string} [props.initialUrl="https://"] - Pre-filled URL value.
@@ -38,11 +39,11 @@ export function LinkModal({ initialUrl = "https://", isEditing = false, onSave, 
     }
   };
 
-  return html`
+  const modalContent = html`
     <div class="pe-cropper-overlay" onClick=${onClose}>
       <div class="pe-link-modal" onClick=${(e) => e.stopPropagation()}>
         <div class="pe-cropper-header">
-          <span class="pe-cropper-title">${isEditing ? "🔗 Edit Hyperlink" : "🔗 Insert Hyperlink"}</span>
+          <span class="pe-cropper-title">${isEditing ? "Edit Hyperlink" : "Insert Hyperlink"}</span>
           <button type="button" class="pe-cropper-close" onClick=${onClose}>×</button>
         </div>
 
@@ -81,4 +82,6 @@ export function LinkModal({ initialUrl = "https://", isEditing = false, onSave, 
       </div>
     </div>
   `;
+
+  return createPortal(modalContent, document.body);
 }

@@ -5,7 +5,7 @@ import { CropperModal } from "./CropperModal.js";
 import { ICONS } from "../components/icons.js";
 
 /**
- * Bento Grid Block component featuring a multi-card grid layout with custom column spans.
+ * Bento Grid Block component with clean icon-only header buttons and compact grid column selectors.
  *
  * @param {object} props
  * @param {object} props.value - Bento grid block JSON value.
@@ -104,6 +104,53 @@ export function BentoGridBlock({ value, schemaType, path }) {
     }
   };
 
+  // Header 1-click grid column selector buttons (2, 3, 4)
+  const headerActions = html`
+    <div class="pe-bento-header-span-group">
+      <span class="pe-bento-header-label">Grid:</span>
+      ${[2, 3, 4].map(
+        (colCount) => html`
+          <button
+            type="button"
+            key=${colCount}
+            class="pe-block-action-btn ${columns === colCount ? "active" : ""}"
+            title="Set ${colCount} Columns Layout"
+            onClick=${(e) => dispatchUpdate({ columns: colCount }, e.target)}
+          >
+            ${colCount}
+          </button>
+        `,
+      )}
+    </div>
+  `;
+
+  // Dynamically generate column span buttons for each card (1x, 2x, 3x, 4x)
+  const renderSpanButtons = (card, cardIndex) => {
+    const spanOptions = [];
+    for (let s = 1; s <= columns; s++) {
+      spanOptions.push(s);
+    }
+    const currentSpan = Math.min(card.colSpan || 1, columns);
+
+    return html`
+      <div class="pe-card-span-btn-group">
+        ${spanOptions.map(
+          (spanVal) => html`
+            <button
+              type="button"
+              key=${spanVal}
+              class="pe-block-action-btn ${currentSpan === spanVal ? "active" : ""}"
+              title="Width: ${spanVal} of ${columns} columns"
+              onClick=${(e) => handleCardUpdate(cardIndex, { colSpan: spanVal }, e.target)}
+            >
+              ${spanVal}x
+            </button>
+          `,
+        )}
+      </div>
+    `;
+  };
+
   return html`
     <${BlockCardWrapper}
       typeName="bentoGrid"
@@ -111,6 +158,7 @@ export function BentoGridBlock({ value, schemaType, path }) {
       icon=${ICONS.bento || ICONS.table}
       value=${value}
       path=${path}
+      headerActions=${headerActions}
     >
       <input
         type="file"
@@ -128,19 +176,6 @@ export function BentoGridBlock({ value, schemaType, path }) {
           value=${sectionTitle}
           onInput=${(e) => dispatchUpdate({ sectionTitle: e.target.value }, e.target)}
         />
-
-        <div class="pe-inline-field-row" style="margin-left: auto;">
-          <span class="pe-field-label">Grid Layout:</span>
-          <select
-            class="pe-bento-col-select"
-            value=${columns}
-            onChange=${(e) => dispatchUpdate({ columns: parseInt(e.target.value) || 3 }, e.target)}
-          >
-            <option value="2">2 Columns</option>
-            <option value="3">3 Columns</option>
-            <option value="4">4 Columns</option>
-          </select>
-        </div>
       </div>
 
       <div class="pe-bento-grid-preview" style="grid-template-columns: repeat(${columns}, 1fr);">
@@ -152,53 +187,33 @@ export function BentoGridBlock({ value, schemaType, path }) {
               style="grid-column: span ${Math.min(card.colSpan || 1, columns)};"
             >
               <div class="pe-bento-item-header">
-                <select
-                  class="pe-bento-span-select"
-                  value=${card.colSpan || 1}
-                  onChange=${(e) =>
-                    handleCardUpdate(idx, { colSpan: parseInt(e.target.value) || 1 }, e.target)}
-                >
-                  <option value="1">1 Col</option>
-                  <option value="2">2 Cols</option>
-                  <option value="3">3 Cols</option>
-                  <option value="4">Full Width</option>
-                </select>
+                ${renderSpanButtons(card, idx)}
 
-                <button
-                  type="button"
-                  class="pe-bento-upload-btn"
-                  title="Upload Image"
-                  onClick=${() => triggerCardUpload(idx)}
-                >
-                  📷 Image
-                </button>
+                <div class="pe-card-header-actions">
+                  <button
+                    type="button"
+                    class="pe-block-action-btn"
+                    title="Upload Image"
+                    onClick=${() => triggerCardUpload(idx)}
+                  >
+                    ${ICONS.image}
+                  </button>
 
-                <button
-                  type="button"
-                  class="pe-bento-delete-btn"
-                  title="Delete Item"
-                  onClick=${(e) => handleDeleteCard(idx, e)}
-                >
-                  🗑
-                </button>
+                  <button
+                    type="button"
+                    class="pe-block-action-btn pe-action-delete"
+                    title="Delete Item"
+                    onClick=${(e) => handleDeleteCard(idx, e)}
+                  >
+                    ${ICONS.trash}
+                  </button>
+                </div>
               </div>
 
               ${card.imageUrl &&
               html`
                 <div class="pe-bento-img-container">
                   <img class="pe-bento-img" src=${card.imageUrl} alt=${card.title} />
-                  <button
-                    type="button"
-                    class="pe-crop-overlay-btn"
-                    style="font-size: 10px; padding: 4px 8px;"
-                    onClick=${() => {
-                      setCropSource(card.imageUrl);
-                      targetCardIndexRef.current = idx;
-                      setActiveCropIndex(idx);
-                    }}
-                  >
-                    ✂️ Crop
-                  </button>
                 </div>
               `}
 
@@ -232,7 +247,8 @@ export function BentoGridBlock({ value, schemaType, path }) {
 
       <div class="pe-bento-footer">
         <button type="button" class="pe-btn pe-btn-active" onClick=${handleAddCard}>
-          + Add Bento Card
+          <span class="pe-btn-icon">${ICONS.plus}</span>
+          <span>Add Bento Card</span>
         </button>
       </div>
 

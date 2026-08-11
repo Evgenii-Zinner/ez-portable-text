@@ -77,6 +77,54 @@ export function createEditorSchema(customBlocks = []) {
         { name: "filename", type: "string" },
       ],
     },
+    {
+      name: "hero",
+      title: "Hero Banner",
+      type: "object",
+      fields: [
+        { name: "title", type: "string" },
+        { name: "subtitle", type: "string" },
+        { name: "imageUrl", type: "string" },
+      ],
+    },
+    {
+      name: "card",
+      title: "Card",
+      type: "object",
+      fields: [
+        { name: "title", type: "string" },
+        { name: "description", type: "string" },
+        { name: "imageUrl", type: "string" },
+        { name: "badge", type: "string" },
+        { name: "linkUrl", type: "string" },
+      ],
+    },
+    {
+      name: "bentoGrid",
+      title: "Bento Grid",
+      type: "object",
+      fields: [
+        { name: "sectionTitle", type: "string" },
+        { name: "columns", type: "number" },
+        {
+          name: "cards",
+          type: "array",
+          of: [
+            {
+              name: "bentoCard",
+              type: "object",
+              fields: [
+                { name: "title", type: "string" },
+                { name: "description", type: "string" },
+                { name: "imageUrl", type: "string" },
+                { name: "badge", type: "string" },
+                { name: "colSpan", type: "number" },
+              ],
+            },
+          ],
+        },
+      ],
+    },
     ...customBlocks.map((b) => {
       const fields = Object.keys(b.defaultValue || {}).map((key) => {
         const val = b.defaultValue[key];
