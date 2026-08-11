@@ -5,7 +5,7 @@ import { CropperModal } from "./CropperModal.js";
 import { ICONS } from "../components/icons.js";
 
 /**
- * Standalone Card Block component with local image upload, cropper, badge, and link.
+ * Single Feature Card Block component with inline title, description, badge, link, image upload, and cropper integration.
  *
  * @param {object} props
  * @param {object} props.value - Card block JSON value.
@@ -60,11 +60,11 @@ export function CardBlock({ value, schemaType, path }) {
   const headerActions = html`
     <button
       type="button"
-      class="pe-upload-header-btn"
-      title="Upload Card Image"
+      class="pe-block-action-btn"
+      title="Upload Image"
       onClick=${triggerFileUpload}
     >
-      📷 Upload Image
+      ${ICONS.image}
     </button>
     <input
       type="file"
@@ -78,75 +78,59 @@ export function CardBlock({ value, schemaType, path }) {
   return html`
     <${BlockCardWrapper}
       typeName="card"
-      title=${schemaType?.title || "Feature Card"}
-      icon=${ICONS.card || ICONS.puzzle}
+      title=${schemaType?.title || "Card"}
+      icon=${ICONS.card}
       value=${value}
       path=${path}
       headerActions=${headerActions}
     >
-      <div class="pe-card-preview-container">
+      <div class="pe-card-block-container">
         ${imageUrl
           ? html`
-              <div class="pe-card-image-wrapper">
-                <img class="pe-card-image" src=${imageUrl} alt=${title} />
-                <button
-                  type="button"
-                  class="pe-crop-overlay-btn"
-                  onClick=${() => {
-                    setCropSource(imageUrl);
-                    setShowCropper(true);
-                  }}
-                >
-                  ✂️ Crop & Adjust
-                </button>
+              <div class="pe-image-display-container">
+                <img class="pe-preview-image" src=${imageUrl} alt=${title} />
               </div>
             `
           : html`
-              <div
-                class="pe-preview-placeholder pe-placeholder-clickable"
-                onClick=${triggerFileUpload}
-              >
-                No Card Image. Click <strong>"📷 Upload Image"</strong> to add an image.
+              <div class="pe-preview-placeholder pe-placeholder-clickable" onClick=${triggerFileUpload}>
+                No Image provided. Click here or the <strong>Image icon</strong> in header to upload an image.
               </div>
             `}
 
-        <div class="pe-card-fields-body">
+        <div class="pe-card-meta-fields">
           <div class="pe-inline-field-row">
             <input
               type="text"
-              class="pe-card-badge-input"
-              placeholder="Tag / Badge (e.g. FEATURED)..."
+              class="pe-inline-input"
+              style="width: 140px; flex-shrink: 0;"
+              placeholder="Badge (e.g. NEW)..."
               value=${badge}
               onInput=${(e) => dispatchUpdate({ badge: e.target.value }, e.target)}
             />
-          </div>
-
-          <input
-            type="text"
-            class="pe-card-title-input"
-            placeholder="Card Title..."
-            value=${title}
-            onInput=${(e) => dispatchUpdate({ title: e.target.value }, e.target)}
-          />
-
-          <textarea
-            class="pe-card-desc-textarea"
-            placeholder="Card description text..."
-            value=${description}
-            onInput=${(e) => dispatchUpdate({ description: e.target.value }, e.target)}
-            rows="2"
-          ></textarea>
-
-          <div class="pe-inline-field-row" style="margin-top: 8px;">
-            <span class="pe-field-label">🔗 Link URL:</span>
             <input
               type="text"
               class="pe-inline-input"
-              placeholder="https://example.com/learn-more"
-              value=${linkUrl}
-              onInput=${(e) => dispatchUpdate({ linkUrl: e.target.value }, e.target)}
+              placeholder="Card Title..."
+              value=${title}
+              onInput=${(e) => dispatchUpdate({ title: e.target.value }, e.target)}
             />
           </div>
+
+          <textarea
+            class="pe-inline-textarea"
+            placeholder="Card description text..."
+            value=${description}
+            onInput=${(e) => dispatchUpdate({ description: e.target.value }, e.target)}
+            rows="3"
+          ></textarea>
+
+          <input
+            type="text"
+            class="pe-inline-input"
+            placeholder="Link URL (optional e.g. https://example.com)..."
+            value=${linkUrl}
+            onInput=${(e) => dispatchUpdate({ linkUrl: e.target.value }, e.target)}
+          />
         </div>
       </div>
 
