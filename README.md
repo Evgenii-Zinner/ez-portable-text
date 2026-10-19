@@ -1,5 +1,12 @@
 # ez-portable-text
 
+> [!WARNING]
+> ### 🌅 Project Sunset & Archived
+>
+> **ez-portable-text** was created specifically as the lightweight, zero-dependency vanilla JS / Web Component editor for the **[EZ EDGE CMS](https://github.com/Evgenii-Zinner/ez-edge-cms)** administration HUD to edit Sanity PortableText JSON without heavy React Studio dependencies.
+>
+> Following the deprecation and archival of `ez-edge-cms` in favor of EmDash (which ships with its own full-featured editing environment out of the box), this project is no longer under active development and has been archived.
+
 [![License](https://img.shields.io/github/license/Evgenii-Zinner/ez-portable-text?style=flat-square&color=10b981)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/Evgenii-Zinner/ez-portable-text?style=flat-square&color=10b981)](https://github.com/Evgenii-Zinner/ez-portable-text/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/Evgenii-Zinner/ez-portable-text?style=flat-square&color=10b981)](https://github.com/Evgenii-Zinner/ez-portable-text/issues)
